@@ -7,21 +7,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --bg-main: #fcfcfd;
             --dy-red: #d61c1c; 
             --dy-gold: #c5a059;
             --dy-dark-crimson: #9e0e0e;
             --dark-neutral: #1a1919; 
-            --border-color: #e5e7eb;
-            --text-primary: #111827;
             --surface-card: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
-        body { background-color: #f3f4f6; color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body { background-color: #f3f4f6; color: #111827; min-height: 100vh; }
         
         /* 3D Login Page */
+        .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
         .auth-box { 
-            max-width: 420px; width: 100%; background: var(--surface-card); padding: 40px; 
+            max-width: 420px; width: 90%; background: var(--surface-card); padding: 40px; 
             border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5); 
             border: 2px solid var(--dy-gold); text-align: center;
         }
@@ -35,34 +33,35 @@
             cursor: pointer; box-shadow: 0 6px 0 var(--dy-dark-crimson);
         }
         
-        /* Dashboard Header */
+        /* Dashboard */
         .app-header { background: var(--dark-neutral); color: white; padding: 10px 30px; display: flex; align-items: center; border-bottom: 3px solid var(--dy-red); }
         .nav-right { margin-left: auto; display: flex; gap: 15px; align-items: center; }
-        .online-dropdown { position: relative; background: #10ac84; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        
-        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; width: 100%; max-width: 1600px; }
+        .online-dropdown { background: #10ac84; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
-        
         .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .styled-table th { background: #2b2a2a; color: white; padding: 12px; }
+        .styled-table th { background: #2b2a2a; color: white; padding: 12px; text-align: center; }
         .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; }
+        .sub-th { font-size: 10px; color: #9ca3af; display: block; }
     </style>
 </head>
 <body>
 
-    <div id="login-container" class="auth-box">
-        <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
-        <div class="brand-title">DYGRUPO</div>
-        <form id="login-form">
-            <div class="input-group"><input type="text" id="username" placeholder="Operator ID" required></div>
-            <div class="input-group"><input type="password" id="password" placeholder="Password" required></div>
-            <button type="submit" class="btn-primary">Login</button>
-        </form>
+    <div id="login-container" class="login-wrapper">
+        <div class="auth-box">
+            <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
+            <div class="brand-title">DYGRUPO</div>
+            <form id="login-form">
+                <div class="input-group"><input type="text" id="username" placeholder="Operator ID" required></div>
+                <div class="input-group"><input type="password" id="password" placeholder="Password" required></div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
     </div>
 
-    <div id="app-container" style="display: none; width: 100%;">
+    <div id="app-container" style="display: none;">
         <header class="app-header">
-            <img src="DY 2606 logo.png.png" style="height:30px;">
+            <img src="DY 2606 logo.png.png" style="height:30px; margin-right:20px;">
             <div class="nav-right">
                 <div class="online-dropdown" onclick="alert('ACTIVE STAFF\n• admin')">● Online Members: 1</div>
                 <div>System Admin: <span id="user-display"></span></div>
@@ -81,7 +80,17 @@
             <main class="card">
                 <h3>Query Output Grid</h3>
                 <table class="styled-table" id="metrics-table">
-                    <thead><tr><th>Agent ID</th><th>Account</th><th>Platform</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>代理ID<span class="sub-th">Agent ID</span></th>
+                            <th>代理账号<span class="sub-th">Account</span></th>
+                            <th>个人修正<span class="sub-th">AVD Fee</span></th>
+                            <th>储户<span class="sub-th">Depositor</span></th>
+                            <th>充值<span class="sub-th">Recharge</span></th>
+                            <th>提现<span class="sub-th">Withdraw</span></th>
+                            <th>平台<span class="sub-th">Platform</span></th>
+                        </tr>
+                    </thead>
                     <tbody id="metrics-tbody"></tbody>
                 </table>
             </main>
