@@ -31,7 +31,6 @@
         .error-msg { margin-top: 15px; color: var(--dy-red); font-size: 13px; font-weight: bold; }
         .app-header { background: var(--dark-neutral); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dy-red); }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .app-logo { font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #ffffff; }
         .platform-badge { background: var(--dy-red); color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; }
         .content-grid { display: grid; grid-template-columns: 330px 1fr; gap: 25px; padding: 25px; max-width: 1750px; margin: 0 auto; }
         .card { background: var(--surface-card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); margin-bottom: 20px; }
@@ -45,6 +44,7 @@
         .sub-th { font-size: 11px; color: #9ca3af; }
         .brand-logo-right { height: 35px; width: auto; margin-left: auto; margin-right: 20px; }
         .dy-logo-left { height: 35px; width: auto; }
+        .online-count { font-size: 24px; font-weight: bold; color: #10ac84; text-align: center; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -52,7 +52,6 @@
     <!-- LOGIN -->
     <div id="login-container" class="auth-box">
         <div class="brand-header">
-            <!-- REPLACE 'DY 2606 logo.png.png' with your actual logo file name -->
             <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
             <div class="brand-title">DYGRUPO</div>
             <p>Authorized Internal Operations Staff Only</p>
@@ -87,6 +86,13 @@
 
         <div class="content-grid">
             <aside class="control-panel">
+                <!-- ONLINE MEMBERS CARD -->
+                <div class="card">
+                    <h3>Online Members</h3>
+                    <div class="online-count" id="online-users">--</div>
+                    <p class="section-desc" style="text-align:center;">Real-time active sessions</p>
+                </div>
+
                 <div class="card" id="admin-sync-card" style="display: none;">
                     <h3>Administrative Data Sync</h3>
                     <p class="section-desc">Upload updated spreadsheet data to cloud storage.</p>
@@ -144,6 +150,12 @@
     <script>
         let globalDatabase = {};
         
+        // Mock Online Users Counter
+        function updateOnlineUsers() {
+            document.getElementById('online-users').innerText = Math.floor(Math.random() * (45 - 20 + 1) + 20);
+        }
+        setInterval(updateOnlineUsers, 5000);
+
         async function fetchCentralDatabase() {
             try {
                 const response = await fetch('database.json');
@@ -175,6 +187,7 @@
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
             document.getElementById('user-display').innerText = user.toUpperCase();
+            updateOnlineUsers();
             
             if (isAdmin) {
                 document.getElementById('admin-sync-card').style.display = 'block';
