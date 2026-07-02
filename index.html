@@ -9,30 +9,49 @@
         :root {
             --bg-main: #fcfcfd;
             --dy-red: #d61c1c; 
+            --dy-gold: #c5a059;
             --dy-dark-crimson: #9e0e0e;
             --dark-neutral: #1a1919; 
             --border-color: #e5e7eb;
             --text-primary: #111827;
             --text-muted: #6b7280;
-            --surface-card: rgba(255, 255, 255, 0.96);
+            --surface-card: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; }
-        .auth-box { max-width: 420px; margin: 60px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-top: 6px solid var(--dy-red); text-align: center; }
+        body { background-color: #f3f4f6; color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        /* 3D Login Box Styling */
+        .auth-box { 
+            max-width: 420px; width: 100%; background: var(--surface-card); padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5); 
+            border: 2px solid var(--dy-gold);
+            text-align: center;
+        }
         .brand-header { margin-bottom: 25px; }
-        .login-logo { height: 60px; margin-bottom: 15px; }
-        .brand-title { font-size: 24px; font-weight: 800; color: var(--dy-red); margin-bottom: 5px; }
+        .login-logo { height: 70px; margin-bottom: 15px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2)); }
+        .brand-title { font-size: 28px; font-weight: 900; color: var(--dy-red); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
         .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-        .input-group input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; background: #f9fafb; }
-        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--dy-red), var(--dy-dark-crimson)); color: #fff; padding: 13px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--dark-neutral); }
+        .input-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 15px; background: #f9fafb; transition: border 0.3s; }
+        .input-group input:focus { border-color: var(--dy-gold); outline: none; }
+        
+        /* 3D Button Style */
+        .btn-primary { 
+            width: 100%; background: linear-gradient(to bottom, var(--dy-red), var(--dy-dark-crimson)); 
+            color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; 
+            cursor: pointer; box-shadow: 0 6px 0 var(--dy-dark-crimson); transition: transform 0.1s;
+        }
+        .btn-primary:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--dy-dark-crimson); }
+        
         .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 6px; cursor: pointer; }
         .btn-success { background-color: #10ac84; color: white; padding: 11px 22px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .error-msg { margin-top: 15px; color: var(--dy-red); font-size: 13px; font-weight: bold; }
-        .app-header { background: var(--dark-neutral); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dy-red); }
+        
+        .app-header { background: var(--dark-neutral); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dy-gold); }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .platform-badge { background: var(--dy-red); color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; }
-        .content-grid { display: grid; grid-template-columns: 330px 1fr; gap: 25px; padding: 25px; max-width: 1750px; margin: 0 auto; }
+        .content-grid { display: grid; grid-template-columns: 330px 1fr; gap: 25px; padding: 25px; max-width: 1750px; margin: 0 auto; width: 100%; }
         .card { background: var(--surface-card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); margin-bottom: 20px; }
         .section-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
         .upload-dropzone { border: 2px dashed #d1d5db; padding: 25px 15px; text-align: center; border-radius: 8px; background: rgba(250,250,250,0.8); cursor: pointer; }
@@ -65,13 +84,13 @@
                 <label>Security Password</label>
                 <input type="password" id="password" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn-primary">Authenticate Session</button>
+            <button type="submit" class="btn-primary">Login</button>
             <div id="login-error" class="error-msg"></div>
         </form>
     </div>
 
     <!-- MAIN DASHBOARD -->
-    <div id="app-container" style="display: none;">
+    <div id="app-container" style="display: none; width: 100%;">
         <header class="app-header">
             <div class="header-left">
                 <img src="DY 2606 logo.png.png" alt="" class="dy-logo-left">
@@ -86,7 +105,6 @@
 
         <div class="content-grid">
             <aside class="control-panel">
-                <!-- ONLINE MEMBERS CARD -->
                 <div class="card">
                     <h3>Online Members</h3>
                     <div class="online-count" id="online-users">--</div>
@@ -149,11 +167,7 @@
 
     <script>
         let globalDatabase = {};
-        
-        // Mock Online Users Counter
-        function updateOnlineUsers() {
-            document.getElementById('online-users').innerText = Math.floor(Math.random() * (45 - 20 + 1) + 20);
-        }
+        function updateOnlineUsers() { document.getElementById('online-users').innerText = Math.floor(Math.random() * (45 - 20 + 1) + 20); }
         setInterval(updateOnlineUsers, 5000);
 
         async function fetchCentralDatabase() {
@@ -164,23 +178,16 @@
                     document.getElementById('welcome-message').innerHTML = `<p style="color:green;">✅ Database Synced: ${Object.keys(globalDatabase).length} records ready.</p>`;
                     document.getElementById('platform-title').innerText = "DATABASE MOUNTED";
                 }
-            } catch (e) {
-                document.getElementById('welcome-message').innerText = "Database offline. Waiting for Admin upload transmission.";
-            }
+            } catch (e) { document.getElementById('welcome-message').innerText = "Database offline. Waiting for Admin upload transmission."; }
         }
 
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
-
-            if (user === "admin" && pass === "dygrupo2026") {
-                bootWorkspace(user, true);
-            } else if (user === "staff" && pass === "dyteam2026") {
-                bootWorkspace(user, false);
-            } else {
-                document.getElementById('login-error').innerText = "Invalid security parameters.";
-            }
+            if (user === "admin" && pass === "dygrupo2026") { bootWorkspace(user, true); } 
+            else if (user === "staff" && pass === "dyteam2026") { bootWorkspace(user, false); } 
+            else { document.getElementById('login-error').innerText = "Invalid security parameters."; }
         });
 
         function bootWorkspace(user, isAdmin) {
@@ -188,21 +195,15 @@
             document.getElementById('app-container').style.display = 'block';
             document.getElementById('user-display').innerText = user.toUpperCase();
             updateOnlineUsers();
-            
-            if (isAdmin) {
-                document.getElementById('admin-sync-card').style.display = 'block';
-            }
+            if (isAdmin) { document.getElementById('admin-sync-card').style.display = 'block'; }
             fetchCentralDatabase();
         }
 
-        function logout() {
-            window.location.reload();
-        }
+        function logout() { window.location.reload(); }
 
         document.getElementById('excel-file-picker').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             document.getElementById('file-status').innerText = "Processing matrix payload...";
             const reader = new FileReader();
             reader.onload = function(evt) {
@@ -210,14 +211,10 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(sheet);
-                
                 let processed = {};
                 rows.forEach(row => {
                     let cleanRow = {};
-                    for (let key in row) {
-                        let normalizedKey = key.replace(/\s+/g, '').replace(/\n/g, '').trim();
-                        cleanRow[normalizedKey] = row[key];
-                    }
+                    for (let key in row) { let normalizedKey = key.replace(/\s+/g, '').replace(/\n/g, '').trim(); cleanRow[normalizedKey] = row[key]; }
                     let idKey = Object.keys(cleanRow).find(k => k.includes('代理ID') || k.toLowerCase().includes('agentid'));
                     if (idKey && cleanRow[idKey]) {
                         processed[String(cleanRow[idKey]).trim()] = {
@@ -234,7 +231,6 @@
                         };
                     }
                 });
-
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(processed));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
@@ -242,9 +238,8 @@
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
-                
                 document.getElementById('file-status').innerText = "Downloaded updated database.json file!";
-                alert("File conversion successful! Now simply drag and drop this new database.json file into your GitHub repository to update your team's live website data instantly.");
+                alert("File conversion successful! Now simply drag and drop this new database.json file into your GitHub repository.");
             };
             reader.readAsArrayBuffer(file);
         });
@@ -253,20 +248,15 @@
             const ids = document.getElementById('search-input').value.split(/[\n, ]+/).map(id => id.trim()).filter(id => id.length > 0);
             const tbody = document.getElementById('metrics-tbody');
             tbody.innerHTML = "";
-
             if(ids.length === 0) return;
             document.getElementById('welcome-message').style.display = "none";
             document.getElementById('table-wrapper').style.display = "block";
             document.getElementById('copy-btn').style.display = "inline-block";
-
             ids.forEach(id => {
                 const tr = document.createElement('tr');
                 const data = globalDatabase[id];
-                if(data) {
-                    tr.innerHTML = `<td><b>${id}</b></td><td>${data.account}</td><td>${data.avdFee}</td><td>${data.depositor}</td><td>${data.recharge}</td><td>${data.withdraw}</td><td>${data.betting}</td><td>${data.average}</td><td>${data.winLose}</td><td>${data.dama}</td><td>${data.platform}</td>`;
-                } else {
-                    tr.innerHTML = `<td><b>${id}</b></td><td colspan="10" style="color:gray; font-style:italic;">No record found.</td>`;
-                }
+                if(data) { tr.innerHTML = `<td><b>${id}</b></td><td>${data.account}</td><td>${data.avdFee}</td><td>${data.depositor}</td><td>${data.recharge}</td><td>${data.withdraw}</td><td>${data.betting}</td><td>${data.average}</td><td>${data.winLose}</td><td>${data.dama}</td><td>${data.platform}</td>`; } 
+                else { tr.innerHTML = `<td><b>${id}</b></td><td colspan="10" style="color:gray; font-style:italic;">No record found.</td>`; }
                 tbody.appendChild(tr);
             });
         }
@@ -276,9 +266,7 @@
             let text = "";
             for (let r = 0; r < table.rows.length; r++) {
                 let rowData = [];
-                for (let c = 0; c < table.rows[r].cells.length; c++) {
-                    rowData.push(table.rows[r].cells[c].innerText.replace(/\n/g, " "));
-                }
+                for (let c = 0; c < table.rows[r].cells.length; c++) { rowData.push(table.rows[r].cells[c].innerText.replace(/\n/g, " ")); }
                 text += rowData.join("\t") + "\n";
             }
             navigator.clipboard.writeText(text);
