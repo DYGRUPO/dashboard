@@ -42,13 +42,8 @@
         .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; background: white; }
         .sub-th { font-size: 11px; color: #9ca3af; }
         
-        /* NEW LOGO STYLING ADDED HERE */
-        .brand-logo-right {
-            height: 35px;
-            width: auto;
-            margin-left: auto;
-            margin-right: 20px;
-        }
+        .brand-logo-right { height: 35px; width: auto; margin-left: auto; margin-right: 20px; }
+        .dy-logo-left { height: 35px; width: auto; }
     </style>
 </head>
 <body>
@@ -77,12 +72,13 @@
     <div id="app-container" style="display: none;">
         <header class="app-header">
             <div class="header-left">
-                <div class="app-logo">DYGRUPO</div>
+                <!-- DY LOGO -->
+                <img src="DY 2606 logo.png.png" alt="" class="dy-logo-left">
                 <span class="platform-badge" id="platform-title">STANDBY MODE</span>
             </div>
             
-            <!-- NEW LOGO ADDED HERE -->
-            <img src="WG-LoGo.png" alt="WG Logo" class="brand-logo-right">
+            <!-- WG LOGO -->
+            <img src="WG-LoGo.png" alt="" class="brand-logo-right">
             
             <div class="header-right">
                 <span id="user-display" style="color:white; margin-right:15px;">Operator</span>
@@ -92,7 +88,6 @@
 
         <div class="content-grid">
             <aside class="control-panel">
-                <!-- ONLY SHOWN TO ADMIN -->
                 <div class="card" id="admin-sync-card" style="display: none;">
                     <h3>Administrative Data Sync</h3>
                     <p class="section-desc">Upload updated spreadsheet data to cloud storage.</p>
@@ -103,7 +98,6 @@
                     <input type="file" id="excel-file-picker" accept=".xlsx, .xls" style="display: none;">
                 </div>
 
-                <!-- SHOWN TO EVERYONE -->
                 <div class="card search-box-card">
                     <h3>Bulk Agent Query</h3>
                     <p class="section-desc">Type or paste multiple Agent IDs below (one per line).</p>
@@ -151,7 +145,6 @@
     <script>
         let globalDatabase = {};
         
-        // Load data from centralized storage endpoint automatically
         async function fetchCentralDatabase() {
             try {
                 const response = await fetch('database.json');
@@ -194,7 +187,6 @@
             window.location.reload();
         }
 
-        // Admin Process File & Save as JSON
         document.getElementById('excel-file-picker').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -231,7 +223,6 @@
                     }
                 });
 
-                // Download the clean JSON file to replace the older copy
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(processed));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
