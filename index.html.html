@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYGRUPO DATA CENTRAL SYSTEM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #fcfcfd;
+            --dy-red: #d61c1c; 
+            --dy-dark-crimson: #9e0e0e;
+            --dark-neutral: #1a1919; 
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-muted: #6b7280;
+            --surface-card: rgba(255, 255, 255, 0.96);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; }
+        .auth-box { max-width: 420px; margin: 90px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-top: 6px solid var(--dy-red); }
+        .brand-header { text-align: center; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; background: #f9fafb; }
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--dy-red), var(--dy-dark-crimson)); color: #fff; padding: 13px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 6px; cursor: pointer; }
+        .btn-success { background-color: #10ac84; color: white; padding: 11px 22px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .error-msg { margin-top: 15px; color: var(--dy-red); font-size: 13px; font-weight: bold; text-align: center; }
+        .app-header { background: var(--dark-neutral); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dy-red); }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .app-logo { font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #ffffff; }
+        .platform-badge { background: var(--dy-red); color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; }
+        .content-grid { display: grid; grid-template-columns: 330px 1fr; gap: 25px; padding: 25px; max-width: 1750px; margin: 0 auto; }
+        .card { background: var(--surface-card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .section-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
+        .upload-dropzone { border: 2px dashed #d1d5db; padding: 25px 15px; text-align: center; border-radius: 8px; background: rgba(250,250,250,0.8); cursor: pointer; }
+        textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 14px; resize: vertical; }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .styled-table th { background-color: #2b2a2a; color: white; padding: 12px; text-align: center; }
+        .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; background: white; }
+        .sub-th { font-size: 11px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login-container" class="auth-box">
+        <div class="brand-header">
+            <h2>Enterprise Hub Login</h2>
+            <p>Authorized Internal Operations Staff Only</p>
+        </div>
+        <form id="login-form">
+            <div class="input-group">
+                <label>Operator ID / Account</label>
+                <input type="text" id="username" required placeholder="Enter username...">
+            </div>
+            <div class="input-group">
+                <label>Security Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary">Authenticate Session</button>
+            <div id="login-error" class="error-msg"></div>
+        </form>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="app-container" style="display: none;">
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">DYGRUPO</div>
+                <span class="platform-badge" id="platform-title">STANDBY MODE</span>
+            </div>
+            <div class="header-right">
+                <span id="user-display" style="color:white; margin-right:15px;">Operator</span>
+                <button onclick="logout()" class="btn-secondary" style="color:white; border-color:white;">Secure Exit</button>
+            </div>
+        </header>
+
+        <div class="content-grid">
+            <aside class="control-panel">
+                <!-- ONLY SHOWN TO ADMIN -->
+                <div class="card" id="admin-sync-card" style="display: none;">
+                    <h3>Administrative Data Sync</h3>
+                    <p class="section-desc">Upload updated spreadsheet data to cloud storage.</p>
+                    <div class="upload-dropzone" onclick="document.getElementById('excel-file-picker').click()">
+                        <p>📥 Click to Upload Global Data</p>
+                        <span id="file-status">Ready to sync</span>
+                    </div>
+                    <input type="file" id="excel-file-picker" accept=".xlsx, .xls" style="display: none;">
+                </div>
+
+                <!-- SHOWN TO EVERYONE -->
+                <div class="card search-box-card">
+                    <h3>Bulk Agent Query</h3>
+                    <p class="section-desc">Type or paste multiple Agent IDs below (one per line).</p>
+                    <textarea id="search-input" rows="8" placeholder="Paste target IDs here..."></textarea>
+                    <button onclick="triggerBatchSearch()" class="btn-primary" style="margin-top: 15px;">Search Spreadsheet</button>
+                </div>
+            </aside>
+
+            <main class="data-view-panel">
+                <div class="card data-card">
+                    <div class="card-action-header" style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <h3>Query Output Grid</h3>
+                        <button onclick="copyTableToClipboard()" id="copy-btn" class="btn-success" style="display: none;">📋 Copy Selection for WPS</button>
+                    </div>
+                    
+                    <div id="welcome-message" style="text-align:center; padding:100px; color:var(--text-muted);">
+                        <p>Loading database assets... Please perform query actions shortly.</p>
+                    </div>
+
+                    <div class="table-responsive" id="table-wrapper" style="display: none;">
+                        <table class="styled-table" id="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>代理ID<br><span class="sub-th">Agent ID</span></th>
+                                    <th>代理账号<br><span class="sub-th">Agent account</span></th>
+                                    <th>个人修正补单<br><span class="sub-th">AVD Fee</span></th>
+                                    <th>储户<br><span class="sub-th">Depositor</span></th>
+                                    <th>直属充值金额<br><span class="sub-th">Recharge</span></th>
+                                    <th>直属提现金额<br><span class="sub-th">Withdraw</span></th>
+                                    <th>直属有效投注<br><span class="sub-th">Direct Betting</span></th>
+                                    <th>平均值<br><span class="sub-th">Average</span></th>
+                                    <th>盈利<br><span class="sub-th">Win/Lose</span></th>
+                                    <th>打码<br><span class="sub-th">Dama</span></th>
+                                    <th>平台<br><span class="sub-th">Platform</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let globalDatabase = {};
+        
+        // Load data from centralized storage endpoint automatically
+        async function fetchCentralDatabase() {
+            try {
+                const response = await fetch('database.json');
+                if (response.ok) {
+                    globalDatabase = await response.json();
+                    document.getElementById('welcome-message').innerHTML = `<p style="color:green;">✅ Database Synced: ${Object.keys(globalDatabase).length} records ready.</p>`;
+                    document.getElementById('platform-title').innerText = "DATABASE MOUNTED";
+                }
+            } catch (e) {
+                document.getElementById('welcome-message').innerText = "Database offline. Waiting for Admin upload transmission.";
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+
+            if (user === "admin" && pass === "dygrupo2026") {
+                bootWorkspace(user, true);
+            } else if (user === "staff" && pass === "dyteam2026") {
+                bootWorkspace(user, false);
+            } else {
+                document.getElementById('login-error').innerText = "Invalid security parameters.";
+            }
+        });
+
+        function bootWorkspace(user, isAdmin) {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('user-display').innerText = user.toUpperCase();
+            
+            if (isAdmin) {
+                document.getElementById('admin-sync-card').style.display = 'block';
+            }
+            fetchCentralDatabase();
+        }
+
+        function logout() {
+            window.location.reload();
+        }
+
+        // Admin Process File & Save as JSON
+        document.getElementById('excel-file-picker').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('file-status').innerText = "Processing matrix payload...";
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet);
+                
+                let processed = {};
+                rows.forEach(row => {
+                    let cleanRow = {};
+                    for (let key in row) {
+                        let normalizedKey = key.replace(/\s+/g, '').replace(/\n/g, '').trim();
+                        cleanRow[normalizedKey] = row[key];
+                    }
+                    let idKey = Object.keys(cleanRow).find(k => k.includes('代理ID') || k.toLowerCase().includes('agentid'));
+                    if (idKey && cleanRow[idKey]) {
+                        processed[String(cleanRow[idKey]).trim()] = {
+                            account: cleanRow[Object.keys(cleanRow).find(k => k.includes('代理账号'))] || '-',
+                            avdFee: cleanRow[Object.keys(cleanRow).find(k => k.includes('个人修正'))] || 0,
+                            depositor: cleanRow[Object.keys(cleanRow).find(k => k.includes('储户') || k.includes('首充'))] || 0,
+                            recharge: cleanRow[Object.keys(cleanRow).find(k => k.includes('充值'))] || 0,
+                            withdraw: cleanRow[Object.keys(cleanRow).find(k => k.includes('提现'))] || 0,
+                            betting: cleanRow[Object.keys(cleanRow).find(k => k.includes('投注'))] || 0,
+                            average: cleanRow[Object.keys(cleanRow).find(k => k.includes('平均'))] || 0,
+                            winLose: cleanRow[Object.keys(cleanRow).find(k => k.includes('盈利'))] || 0,
+                            dama: cleanRow[Object.keys(cleanRow).find(k => k.includes('打码'))] || 0,
+                            platform: cleanRow[Object.keys(cleanRow).find(k => k.includes('平台'))] || '-'
+                        };
+                    }
+                });
+
+                // Download the clean JSON file to replace the older copy
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(processed));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "database.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                
+                document.getElementById('file-status').innerText = "Downloaded updated database.json file!";
+                alert("File conversion successful! Now simply drag and drop this new database.json file into your GitHub repository to update your team's live website data instantly.");
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function triggerBatchSearch() {
+            const ids = document.getElementById('search-input').value.split(/[\n, ]+/).map(id => id.trim()).filter(id => id.length > 0);
+            const tbody = document.getElementById('metrics-tbody');
+            tbody.innerHTML = "";
+
+            if(ids.length === 0) return;
+            document.getElementById('welcome-message').style.display = "none";
+            document.getElementById('table-wrapper').style.display = "block";
+            document.getElementById('copy-btn').style.display = "inline-block";
+
+            ids.forEach(id => {
+                const tr = document.createElement('tr');
+                const data = globalDatabase[id];
+                if(data) {
+                    tr.innerHTML = `<td><b>${id}</b></td><td>${data.account}</td><td>${data.avdFee}</td><td>${data.depositor}</td><td>${data.recharge}</td><td>${data.withdraw}</td><td>${data.betting}</td><td>${data.average}</td><td>${data.winLose}</td><td>${data.dama}</td><td>${data.platform}</td>`;
+                } else {
+                    tr.innerHTML = `<td><b>${id}</b></td><td colspan="10" style="color:gray; font-style:italic;">No record found.</td>`;
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        function copyTableToClipboard() {
+            const table = document.getElementById('metrics-table');
+            let text = "";
+            for (let r = 0; r < table.rows.length; r++) {
+                let rowData = [];
+                for (let c = 0; c < table.rows[r].cells.length; c++) {
+                    rowData.push(table.rows[r].cells[c].innerText.replace(/\n/g, " "));
+                }
+                text += rowData.join("\t") + "\n";
+            }
+            navigator.clipboard.writeText(text);
+            alert("Copied to clipboard!");
+        }
+    </script>
+</body>
+</html>
