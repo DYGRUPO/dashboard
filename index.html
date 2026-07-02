@@ -2,40 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DYGRUPO SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYGRUPO DATA CENTRAL SYSTEM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* CSS remains the same as previously established to maintain your 3D design */
-        :root { --dy-red: #d61c1c; --dy-gold: #c5a059; --dy-dark-crimson: #9e0e0e; }
-        body { font-family: sans-serif; background: #f3f4f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .auth-box { max-width: 420px; width: 90%; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); border: 2px solid var(--dy-gold); text-align: center; }
-        .btn-primary { width: 100%; background: linear-gradient(to bottom, var(--dy-red), var(--dy-dark-crimson)); color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        :root {
+            --bg-main: #fcfcfd;
+            --dy-red: #d61c1c; 
+            --dy-gold: #c5a059;
+            --dy-dark-crimson: #9e0e0e;
+            --dark-neutral: #1a1919; 
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --surface-card: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+        body { background-color: #f3f4f6; color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        /* 3D Login Page */
+        .auth-box { 
+            max-width: 420px; width: 100%; background: var(--surface-card); padding: 40px; 
+            border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5); 
+            border: 2px solid var(--dy-gold); text-align: center;
+        }
+        .login-logo { height: 70px; margin-bottom: 15px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2)); }
+        .brand-title { font-size: 28px; font-weight: 900; color: var(--dy-red); margin-bottom: 20px; text-transform: uppercase; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 10px; }
+        .btn-primary { 
+            width: 100%; background: linear-gradient(to bottom, var(--dy-red), var(--dy-dark-crimson)); 
+            color: #fff; padding: 15px; border: none; border-radius: 10px; font-weight: bold; 
+            cursor: pointer; box-shadow: 0 6px 0 var(--dy-dark-crimson);
+        }
+        
+        /* Dashboard Header */
+        .app-header { background: var(--dark-neutral); color: white; padding: 10px 30px; display: flex; align-items: center; border-bottom: 3px solid var(--dy-red); }
+        .nav-right { margin-left: auto; display: flex; gap: 15px; align-items: center; }
+        .online-dropdown { position: relative; background: #10ac84; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        
+        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; width: 100%; max-width: 1600px; }
+        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
+        
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .styled-table th { background: #2b2a2a; color: white; padding: 12px; }
+        .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-container" class="auth-box">
+        <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
         <div class="brand-title">DYGRUPO</div>
         <form id="login-form">
-            <input type="text" id="username" placeholder="Operator ID" style="width:100%; padding:10px; margin-bottom:10px;" required>
-            <input type="password" id="password" placeholder="Password" style="width:100%; padding:10px; margin-bottom:20px;" required>
+            <div class="input-group"><input type="text" id="username" placeholder="Operator ID" required></div>
+            <div class="input-group"><input type="password" id="password" placeholder="Password" required></div>
             <button type="submit" class="btn-primary">Login</button>
         </form>
-        <div id="debug-log" style="font-size:10px; margin-top:10px; color:red;"></div>
+    </div>
+
+    <div id="app-container" style="display: none; width: 100%;">
+        <header class="app-header">
+            <img src="DY 2606 logo.png.png" style="height:30px;">
+            <div class="nav-right">
+                <div class="online-dropdown" onclick="alert('ACTIVE STAFF\n• admin')">● Online Members: 1</div>
+                <div>System Admin: <span id="user-display"></span></div>
+                <button onclick="window.location.reload()">Secure Exit</button>
+            </div>
+        </header>
+
+        <div class="content-grid">
+            <aside>
+                <div class="card" id="admin-sync-card" style="display:none;">
+                    <h3>Administrative Data Sync</h3>
+                    <button onclick="document.getElementById('excel-file-picker').click()">Click to Load File Data</button>
+                    <input type="file" id="excel-file-picker" style="display:none;">
+                </div>
+            </aside>
+            <main class="card">
+                <h3>Query Output Grid</h3>
+                <table class="styled-table" id="metrics-table">
+                    <thead><tr><th>Agent ID</th><th>Account</th><th>Platform</th></tr></thead>
+                    <tbody id="metrics-tbody"></tbody>
+                </table>
+            </main>
+        </div>
     </div>
 
     <script>
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
-            const log = document.getElementById('debug-log');
-            
-            // Basic authentication simulation
             if (user === "admin" || user === "staff") {
-                alert("Login successful. Redirecting to dashboard...");
-                window.location.reload(); 
-            } else {
-                log.innerText = "Error: Invalid credentials or database unreachable.";
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                document.getElementById('user-display').innerText = user;
+                if(user === "admin") document.getElementById('admin-sync-card').style.display = 'block';
             }
         });
     </script>
