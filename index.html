@@ -33,7 +33,7 @@
             cursor: pointer; box-shadow: 0 6px 0 var(--dy-dark-crimson);
         }
         
-        /* Dashboard */
+        /* Full Dashboard */
         .app-header { background: var(--dark-neutral); color: white; padding: 10px 30px; display: flex; align-items: center; border-bottom: 3px solid var(--dy-red); }
         .nav-right { margin-left: auto; display: flex; gap: 15px; align-items: center; }
         .online-dropdown { background: #10ac84; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; }
@@ -59,19 +59,21 @@
         </div>
     </div>
 
+    <!-- Restored Dashboard Structure -->
     <div id="app-container" style="display: none;">
         <header class="app-header">
             <img src="DY 2606 logo.png.png" style="height:30px; margin-right:20px;">
             <div class="nav-right">
-                <div class="online-dropdown" onclick="alert('ACTIVE STAFF\n• admin')">● Online Members: 1</div>
+                <div class="online-dropdown" id="online-status">● Online Members: 1</div>
                 <div>System Admin: <span id="user-display"></span></div>
                 <button onclick="window.location.reload()">Secure Exit</button>
             </div>
         </header>
 
         <div class="content-grid">
-            <aside>
-                <div class="card" id="admin-sync-card" style="display:none;">
+            <aside id="sidebar">
+                <!-- Original Admin Functionality -->
+                <div class="card">
                     <h3>Administrative Data Sync</h3>
                     <button onclick="document.getElementById('excel-file-picker').click()">Click to Load File Data</button>
                     <input type="file" id="excel-file-picker" style="display:none;">
@@ -98,6 +100,7 @@
     </div>
 
     <script>
+        // Login Logic
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
@@ -105,9 +108,10 @@
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('app-container').style.display = 'block';
                 document.getElementById('user-display').innerText = user;
-                if(user === "admin") document.getElementById('admin-sync-card').style.display = 'block';
             }
         });
+
+        // Add your existing data processing scripts and file handling logic here
     </script>
 </body>
 </html>
