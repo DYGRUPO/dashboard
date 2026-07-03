@@ -1,38 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DYGRUPO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYGRUPO DATA CENTRAL SYSTEM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f3f4f6; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        :root {
+            --dy-red: #d61c1c; 
+            --dy-gold: #c5a059;
+            --dy-dark-crimson: #9e0e0e;
+            --dark-neutral: #1a1919; 
+            --surface-card: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+        body { background-color: #f3f4f6; color: #111827; min-height: 100vh; }
+        
+        /* 3D Login Page */
+        .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .auth-box { 
+            max-width: 420px; width: 90%; background: var(--surface-card); padding: 40px; 
+            border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5); 
+            border: 2px solid var(--dy-gold); text-align: center;
+        }
+        .login-logo { height: 70px; margin-bottom: 15px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2)); }
+        .brand-title { font-size: 28px; font-weight: 900; color: var(--dy-red); margin-bottom: 20px; text-transform: uppercase; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 10px; }
+        .btn-primary { 
+            width: 100%; background: linear-gradient(to bottom, var(--dy-red), var(--dy-dark-crimson)); 
+            color: #fff; padding: 15px; border: none; border-radius: 10px; font-weight: bold; 
+            cursor: pointer; box-shadow: 0 6px 0 var(--dy-dark-crimson);
+        }
+        
+        /* Dashboard Styling */
+        .app-header { background: var(--dark-neutral); color: white; padding: 10px 30px; display: flex; align-items: center; border-bottom: 3px solid var(--dy-red); }
+        .nav-right { margin-left: auto; display: flex; gap: 15px; align-items: center; }
+        .online-dropdown { background: #10ac84; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .styled-table th { background: #2b2a2a; color: white; padding: 12px; text-align: center; }
+        .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; }
+        .sub-th { font-size: 10px; color: #9ca3af; display: block; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>Administrative Data Sync</h3>
-        <input type="file" id="upload" onchange="handleFile(event)">
+
+    <!-- Login Page -->
+    <div id="login-container" class="login-wrapper">
+        <div class="auth-box">
+            <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
+            <div class="brand-title">DYGRUPO</div>
+            <form id="login-form">
+                <div class="input-group"><input type="text" id="username" placeholder="Operator ID" required></div>
+                <div class="input-group"><input type="password" id="password" placeholder="Password" required></div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
     </div>
-    <div class="card">
-        <table id="table">
-            <tbody id="tbody"></tbody>
-        </table>
+
+    <!-- Main Dashboard -->
+    <div id="app-container" style="display: none;">
+        <header class="app-header">
+            <img src="DY 2606 logo.png.png" style="height:30px; margin-right:20px;">
+            <div class="nav-right">
+                <div class="online-dropdown" onclick="alert('ACTIVE STAFF\n• admin')">● Online Members: 1</div>
+                <div>System Admin: <span id="user-display"></span></div>
+                <button onclick="window.location.reload()">Secure Exit</button>
+            </div>
+        </header>
+
+        <div class="content-grid">
+            <aside>
+                <div class="card" id="admin-sync-card" style="display:none;">
+                    <h3>Administrative Data Sync</h3>
+                    <button onclick="document.getElementById('excel-file-picker').click()">Click to Load File Data</button>
+                    <input type="file" id="excel-file-picker" style="display:none;" onchange="handleFile(event)">
+                </div>
+            </aside>
+            <main class="card">
+                <h3>Query Output Grid</h3>
+                <table class="styled-table" id="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>代理ID<span class="sub-th">Agent ID</span></th>
+                            <th>代理账号<span class="sub-th">Account</span></th>
+                            <th>个人修正<span class="sub-th">AVD Fee</span></th>
+                            <th>储户<span class="sub-th">Depositor</span></th>
+                            <th>充值<span class="sub-th">Recharge</span></th>
+                            <th>提现<span class="sub-th">Withdraw</span></th>
+                            <th>平台<span class="sub-th">Platform</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="metrics-tbody"></tbody>
+                </table>
+            </main>
+        </div>
     </div>
+
     <script>
+        // Handle Login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            if (user === "admin" || user === "staff") {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                document.getElementById('user-display').innerText = user;
+                if(user === "admin") document.getElementById('admin-sync-card').style.display = 'block';
+            } else { alert("Invalid login"); }
+        });
+
+        // Handle Excel File Upload
         function handleFile(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const wb = XLSX.read(data, {type: 'array'});
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                const tbody = document.getElementById('tbody');
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet);
+                const tbody = document.getElementById('metrics-tbody');
                 tbody.innerHTML = '';
                 rows.forEach(row => {
-                    tbody.innerHTML += `<tr><td>${row['代理ID']||''}</td><td>${row['代理账号']||''}</td></tr>`;
+                    tbody.innerHTML += `<tr>
+                        <td>${row['代理ID']||''}</td><td>${row['代理账号']||''}</td>
+                        <td>${row['个人修正']||''}</td><td>${row['储户']||''}</td>
+                        <td>${row['充值']||''}</td><td>${row['提现']||''}</td><td>${row['平台']||''}</td>
+                    </tr>`;
                 });
             };
             reader.readAsArrayBuffer(file);
