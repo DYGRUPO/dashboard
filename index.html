@@ -47,7 +47,6 @@
 </head>
 <body>
 
-    <!-- Login Page -->
     <div id="login-container" class="login-wrapper">
         <div class="auth-box">
             <img src="DY 2606 logo.png.png" alt="Logo" class="login-logo">
@@ -60,7 +59,6 @@
         </div>
     </div>
 
-    <!-- Main Dashboard -->
     <div id="app-container" style="display: none;">
         <header class="app-header">
             <img src="DY 2606 logo.png.png" style="height:30px; margin-right:20px;">
@@ -100,7 +98,6 @@
     </div>
 
     <script>
-        // Handle Login
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
@@ -112,7 +109,6 @@
             } else { alert("Invalid login"); }
         });
 
-        // Handle Excel File Upload
         function handleFile(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
