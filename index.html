@@ -1,93 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>DYGRUPO DATA SYSTEM</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        :root { --dy-red: #d61c1c; --dy-gold: #c5a059; --dark-neutral: #1a1919; }
-        body { background-color: #f3f4f6; font-family: sans-serif; margin: 0; }
-        
-        /* Login Wrapper - Ensures it shows up first */
-        #login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .auth-box { width: 400px; background: white; padding: 40px; border-radius: 20px; border: 2px solid var(--dy-gold); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .btn-primary { width: 100%; background: var(--dy-red); color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        
-        /* Dashboard Layout */
-        #app-container { display: none; }
-        .app-header { background: var(--dark-neutral); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #2b2a2a; color: white; padding: 12px; font-size: 13px; }
-        td { padding: 10px; border: 1px solid #ddd; text-align: center; font-size: 13px; }
-    </style>
+<meta charset="UTF-8">
+<title>DYGRUPO Dashboard</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+
+:root{
+--dy-red:#d61c1c;
+--dy-gold:#c5a059;
+--dark:#1b1b1b;
+}
+
+body{
+margin:0;
+font-family:Arial;
+background:#f3f3f3;
+background-size:cover;
+}
+
+#login-container{
+
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+
+background:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600');
+background-size:cover;
+}
+
+.auth-box{
+
+background:white;
+width:420px;
+padding:30px;
+border-radius:20px;
+text-align:center;
+}
+
+.auth-box input{
+
+width:95%;
+padding:12px;
+margin:10px;
+}
+
+.btn{
+
+background:var(--dy-red);
+color:white;
+padding:12px;
+border:none;
+width:100%;
+cursor:pointer;
+border-radius:8px;
+
+}
+
+#app-container{
+
+display:none;
+
+}
+
+.app-header{
+
+background:var(--dark);
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+color:white;
+
+}
+
+.logo-area{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+}
+
+.logo-area img{
+
+height:50px;
+
+}
+
+.content{
+
+display:grid;
+grid-template-columns:320px auto;
+gap:20px;
+padding:20px;
+
+}
+
+.card{
+
+background:white;
+padding:20px;
+border-radius:10px;
+
+}
+
+.search{
+
+padding:10px;
+width:100%;
+
+}
+
+.tableWrap{
+
+overflow:auto;
+max-height:650px;
+
+}
+
+thead th{
+
+position:sticky;
+top:0;
+background:#222;
+color:white;
+z-index:10;
+
+}
+
+table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:10px;
+border:1px solid #ddd;
+font-size:13px;
+text-align:center;
+
+}
+
+</style>
 </head>
+
 <body>
 
-<!-- Login Section -->
 <div id="login-container">
-    <div class="auth-box">
-        <img src="DY 2606 logo.png" style="height:70px; margin-bottom:15px;">
-        <h2>DYGRUPO</h2>
-        <input type="text" id="username" placeholder="Operator ID" style="width:100%; padding:10px; margin:10px 0;">
-        <input type="password" id="password" placeholder="Password" style="width:100%; padding:10px; margin-bottom:10px;">
-        <button class="btn-primary" onclick="login()">Login</button>
-    </div>
+
+<div class="auth-box">
+
+<img src="DY 2606 logo.png" height="80">
+
+<h2>DYGRUPO Dashboard</h2>
+
+<input id="username" placeholder="Username">
+
+<input id="password" type="password" placeholder="Password">
+
+<button class="btn" onclick="login()">Login</button>
+
 </div>
 
-<!-- Dashboard Section -->
+</div>
+
+
 <div id="app-container">
-    <header class="app-header">
-        <div>DYGRUPO DATA</div>
-        <div>
-            <span id="user-display"></span> | 
-            <button onclick="location.reload()">Secure Exit</button>
-        </div>
-    </header>
-    <div class="content-grid">
-        <div class="card">
-            <h3>Data Upload</h3>
-            <input type="file" id="excel-file" onchange="processFile(event)">
-        </div>
-        <div class="card">
-            <h3>Query Output Grid</h3>
-            <table id="metrics-table">
-                <thead>
-                    <tr><th>Agent ID</th><th>Account</th><th>AVD Fee</th><th>Depositor</th><th>Recharge</th><th>Withdraw</th><th>Platform</th></tr>
-                </thead>
-                <tbody id="metrics-tbody"></tbody>
-            </table>
-        </div>
-    </div>
+
+<header class="app-header">
+
+<div class="logo-area">
+
+<img src="DY 2606 logo.png">
+
+<img src="WG-LoGo.png">
+
+<div>
+
+<b>DYGRUPO Dashboard</b>
+
+</div>
+
+</div>
+
+<div>
+
+Online Members:1 |
+<span id="user-display"></span>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+</header>
+
+<div class="content">
+
+<div>
+
+<div class="card">
+
+<h3>ID 搜索 Search:Agent ID 🔍</h3>
+
+<input class="search" id="searchInput" onkeyup="searchAgent()" placeholder="Search Agent ID">
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h3>导入数据 Data Sync</h3>
+
+<input type="file" onchange="processFile(event)">
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h3>账号配置管理</h3>
+
+Create User Function Ready
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>代理数据 DATA RESULT 📈</h3>
+
+<div class="tableWrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>代理ID</th>
+<th>代理账号</th>
+<th>个人修正补单</th>
+<th>储户</th>
+<th>充值</th>
+<th>提现</th>
+<th>直属有效投注</th>
+<th>平均值</th>
+<th>盈利</th>
+<th>打码</th>
+<th>平台</th>
+
+</tr>
+
+</thead>
+
+<tbody id="metrics-tbody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 <script>
-    function login() {
-        const user = document.getElementById('username').value;
-        if(user === "admin" || user === "staff") {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            document.getElementById('user-display').innerText = "System Admin: " + user;
-        } else { alert("Invalid credentials"); }
-    }
 
-    function processFile(e) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const sheetName = workbook.SheetNames[0];
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-            const tbody = document.getElementById('metrics-tbody');
-            tbody.innerHTML = '';
-            rows.forEach(row => {
-                tbody.innerHTML += `<tr><td>${row['代理ID']||''}</td><td>${row['代理账号']||''}</td><td>${row['个人修正']||''}</td><td>${row['储户']||''}</td><td>${row['充值']||''}</td><td>${row['提现']||''}</td><td>${row['平台']||''}</td></tr>`;
-            });
-        };
-        reader.readAsArrayBuffer(file);
-    }
+let users={
+
+admin:"123456",
+staff:"123456"
+
+}
+
+function login(){
+
+let user=document.getElementById("username").value;
+let pass=document.getElementById("password").value;
+
+if(users[user]===pass){
+
+document.getElementById("login-container").style.display="none";
+
+document.getElementById("app-container").style.display="block";
+
+document.getElementById("user-display").innerText=user;
+
+}else{
+
+alert("Wrong login");
+
+}
+
+}
+
+
+function logout(){
+
+location.reload()
+
+}
+
+
+function processFile(e){
+
+let file=e.target.files[0];
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+let workbook=XLSX.read(e.target.result,{type:'binary'});
+
+let sheet=workbook.Sheets[workbook.SheetNames[0]];
+
+let rows=XLSX.utils.sheet_to_json(sheet);
+
+let tbody=document.getElementById("metrics-tbody");
+
+tbody.innerHTML='';
+
+rows.forEach(r=>{
+
+tbody.innerHTML+=`
+
+<tr>
+
+<td>${r['代理ID']||''}</td>
+<td>${r['代理账号']||''}</td>
+<td>${r['个人修正补单']||''}</td>
+<td>${r['储户']||''}</td>
+<td>${r['直属充值金额']||''}</td>
+<td>${r['直属提现金额']||''}</td>
+<td>${r['直属有效投注']||''}</td>
+<td>${r['平均值']||''}</td>
+<td>${r['盈利']||''}</td>
+<td>${r['打码']||''}</td>
+<td>${r['平台']||''}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+reader.readAsBinaryString(file);
+
+}
+
+
+function searchAgent(){
+
+let input=document.getElementById("searchInput").value.toLowerCase();
+
+let rows=document.querySelectorAll("#metrics-tbody tr");
+
+rows.forEach(r=>{
+
+let txt=r.innerText.toLowerCase();
+
+r.style.display=txt.includes(input)?"":"none";
+
+})
+
+}
+
 </script>
+
 </body>
 </html>
