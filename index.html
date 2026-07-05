@@ -697,35 +697,36 @@
                         if (id) {
 let accountKey = Object.keys(cleanRow).find(k =>
     k.includes('代理账号') ||
-    k.toLowerCase().includes('agentaccount')
+    k.toLowerCase().includes('agent account')
 ) || '';
 
 let avdKey = Object.keys(cleanRow).find(k =>
+    k.includes('个人修正补单') ||
     k.includes('个人修正') ||
-    k.toLowerCase().includes('avd')
+    k.toLowerCase().includes('avd fee')
 ) || '';
 
 let depKey = Object.keys(cleanRow).find(k =>
     k.includes('储户') ||
-    k.toLowerCase().includes('depositor')
+    k.includes('depositor')
 ) || '';
 
 let rechKey = Object.keys(cleanRow).find(k =>
+    k.includes('直属充值金额') ||
     k.includes('充值') ||
     k.toLowerCase().includes('recharge')
 ) || '';
 
 let withKey = Object.keys(cleanRow).find(k =>
+    k.includes('直属提现金额') ||
     k.includes('提现') ||
     k.toLowerCase().includes('withdraw')
 ) || '';
 
 let betKey = Object.keys(cleanRow).find(k =>
     k.includes('直属有效投注') ||
-    k.toLowerCase().includes('directbetting')
+    k.toLowerCase().includes('direct betting')
 ) || '';
-
-/* FIX H / I / J EXCEL COLUMN MAPPING */
 
 let avgKey = Object.keys(cleanRow).find(k =>
     k.includes('平均值') ||
@@ -734,8 +735,7 @@ let avgKey = Object.keys(cleanRow).find(k =>
 
 let winKey = Object.keys(cleanRow).find(k =>
     k.includes('盈利') ||
-    k.toLowerCase().includes('win') ||
-    k.toLowerCase().includes('winlose')
+    k.toLowerCase().includes('win/lose')
 ) || '';
 
 let damaKey = Object.keys(cleanRow).find(k =>
@@ -750,18 +750,18 @@ let platformKey = Object.keys(cleanRow).find(k =>
 
 indexedSpreadsheetData[id] = {
     id:id,
-    account:cleanRow[accountKey] || '',
-    avd:cleanRow[avdKey] || 0,
-    depositor:cleanRow[depKey] || 0,
-    recharge:cleanRow[rechKey] || 0,
-    withdraw:cleanRow[withKey] || 0,
-    betting:cleanRow[betKey] || 0,
+    account: cleanRow[accountKey] || '',
+    avd: Number(cleanRow[avdKey]) || 0,
+    depositor: Number(cleanRow[depKey]) || 0,
+    recharge: Number(cleanRow[rechKey]) || 0,
+    withdraw: Number(cleanRow[withKey]) || 0,
+    betting: Number(cleanRow[betKey]) || 0,
 
-    average:cleanRow[avgKey] || 0,
-    winlose:cleanRow[winKey] || 0,
-    dama:cleanRow[damaKey] || 0,
+    average: Number(cleanRow[avgKey]) || 0,
+    winlose: Number(cleanRow[winKey]) || 0,
+    dama: Number(cleanRow[damaKey]) || 0,
 
-    platform:cleanRow[platformKey] || ''
+    platform: cleanRow[platformKey] || ''
 };
                         }
                     });
