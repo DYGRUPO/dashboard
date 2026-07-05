@@ -158,28 +158,40 @@
 </head>
 <body>
 
-    <!-- SECURE TEAM SIGN IN GATEWAY -->
-    <div id="login-container" class="auth-box">
-        <div class="brand-header">
-            <div class="logo-wrapper">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY GRUPO" class="auth-logo" id="main-global-logo-1">
-            </div>
-            <h2>Advertising Departments</h2>
+<!-- SECURE TEAM SIGN IN GATEWAY -->
+<div id="login-container" class="auth-box">
+    <div class="brand-header">
+        <div class="logo-wrapper">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY GRUPO" class="auth-logo" id="main-global-logo-1">
         </div>
-        <form id="login-form">
-            <div class="input-group">
-                <label>账号 User Account</label>
-                <input type="text" id="username" required placeholder="Enter username...">
-            </div>
-            <div class="input-group">
-                <label>密码 Security Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
-            </div>
-            <button type="submit" class="btn-primary">登录 LogIn</button>
-            <div id="login-error" class="error-msg"></div>
-            <p>WWW.DYGRUPO.COM<p>
-        </form>
+
+        <h2>Advertising Departments</h2>
     </div>
+
+    <form id="login-form">
+
+        <div class="input-group">
+            <label>账号 User Account</label>
+            <input type="text" id="username" required placeholder="Enter username...">
+        </div>
+
+        <div class="input-group">
+            <label>密码 Security Password</label>
+            <input type="password" id="password" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn-primary">
+            登录 LogIn
+        </button>
+
+        <div id="login-error" class="error-msg"></div>
+
+        <div class="website-link">
+            <a href="#">WWW.DYGRUPO.COM</a>
+        </div>
+
+    </form>
+</div>
 
     <!-- MAIN DASHBOARD CONTENT (HIDDEN BY DEFAULT UNTIL AUTHENTICATED) -->
     <div id="app-container" class="main-workspace" style="display: none;">
