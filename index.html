@@ -695,29 +695,74 @@
                         let id = idKey ? cleanRow[idKey] : '';
                         
                         if (id) {
-                            let accountKey = Object.keys(cleanRow).find(k => k.includes('代理账号') || k.toLowerCase().includes('agentaccount')) || '';
-                            let avdKey = Object.keys(cleanRow).find(k => k.includes('个人修正') || k.toLowerCase().includes('avd')) || '';
-                            let depKey = Object.keys(cleanRow).find(k => k.includes('首充') || k.includes('储户') || k.toLowerCase().includes('depositor')) || '';
-                            let rechKey = Object.keys(cleanRow).find(k => k.includes('充值') || k.toLowerCase().includes('recharge')) || '';
-                            let withKey = Object.keys(cleanRow).find(k => k.includes('提现') || k.toLowerCase().includes('withdraw')) || '';
-                            let betKey = Object.keys(cleanRow).find(k => k.includes('投注') || k.toLowerCase().includes('betting')) || '';
-                            let avgKey = Object.keys(cleanRow).find(k => k.includes('平均') || k.toLowerCase().includes('average')) || '';
-                            let wlKey = Object.keys(cleanRow).find(k => k.includes('盈利') || k.toLowerCase().includes('win')) || '';
-                            let damaKey = Object.keys(cleanRow).find(k => k.includes('打码') || k.toLowerCase().includes('dama')) || '';
-                            let platKey = Object.keys(cleanRow).find(k => k.includes('平台') || k.toLowerCase().includes('platform')) || '';
+let accountKey = Object.keys(cleanRow).find(k =>
+    k.includes('代理账号') ||
+    k.toLowerCase().includes('agentaccount')
+) || '';
 
-                            indexedSpreadsheetData[String(id).trim()] = {
-                                account: cleanRow[accountKey] || '-',
-                                avdFee: cleanRow[avdKey] || 0,
-                                depositor: cleanRow[depKey] || 0,
-                                recharge: cleanRow[rechKey] || 0,
-                                withdraw: cleanRow[withKey] || 0,
-                                betting: cleanRow[betKey] || 0,
-                                average: cleanRow[avgKey] || 0,
-                                winLose: cleanRow[wlKey] || 0,
-                                dama: cleanRow[damaKey] || 0,
-                                platform: cleanRow[platKey] || '-'
-                            };
+let avdKey = Object.keys(cleanRow).find(k =>
+    k.includes('个人修正') ||
+    k.toLowerCase().includes('avd')
+) || '';
+
+let depKey = Object.keys(cleanRow).find(k =>
+    k.includes('储户') ||
+    k.toLowerCase().includes('depositor')
+) || '';
+
+let rechKey = Object.keys(cleanRow).find(k =>
+    k.includes('充值') ||
+    k.toLowerCase().includes('recharge')
+) || '';
+
+let withKey = Object.keys(cleanRow).find(k =>
+    k.includes('提现') ||
+    k.toLowerCase().includes('withdraw')
+) || '';
+
+let betKey = Object.keys(cleanRow).find(k =>
+    k.includes('直属有效投注') ||
+    k.toLowerCase().includes('directbetting')
+) || '';
+
+/* FIX H / I / J EXCEL COLUMN MAPPING */
+
+let avgKey = Object.keys(cleanRow).find(k =>
+    k.includes('平均值') ||
+    k.toLowerCase().includes('average')
+) || '';
+
+let winKey = Object.keys(cleanRow).find(k =>
+    k.includes('盈利') ||
+    k.toLowerCase().includes('win') ||
+    k.toLowerCase().includes('winlose')
+) || '';
+
+let damaKey = Object.keys(cleanRow).find(k =>
+    k.includes('打码') ||
+    k.toLowerCase().includes('dama')
+) || '';
+
+let platformKey = Object.keys(cleanRow).find(k =>
+    k.includes('平台') ||
+    k.toLowerCase().includes('platform')
+) || '';
+
+indexedSpreadsheetData[id] = {
+    id:id,
+    account:cleanRow[accountKey] || '',
+    avd:cleanRow[avdKey] || 0,
+    depositor:cleanRow[depKey] || 0,
+    recharge:cleanRow[rechKey] || 0,
+    withdraw:cleanRow[withKey] || 0,
+    betting:cleanRow[betKey] || 0,
+
+    average:cleanRow[avgKey] || 0,
+    winlose:cleanRow[winKey] || 0,
+    dama:cleanRow[damaKey] || 0,
+
+    platform:cleanRow[platformKey] || ''
+};
                         }
                     });
 
