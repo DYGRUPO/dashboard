@@ -1,1 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYGRUPO DATA SYSTEM</title>
+    <!-- SheetJS for processing local Excel data -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-main: #fcfcfd;
+            --dy-red: #d61c1c; 
+            --dy-gold: #c5a059;
+            --dy-dark-crimson: #9e0e0e;
+            --dark-neutral: #1a1919; 
+            --border-color: #f72847;
+            --text-primary: #111827;
+            --text-muted: #6b7280;
+            --surface-card: rgba(255, 255, 255, 0.96);
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-primary); 
+            min-height: 100vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background 0.8s ease-in-out, filter 0.3s;
+        }
+
+        /* Dimensional Grid Overlays */
+        body.style-3d::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.15) 25%, transparent 25%), 
+                        linear-gradient(225deg, rgba(0,0,0,0.15) 25%, transparent 25%);
+            background-size: 40px 40px; z-index: -1; pointer-events: none; opacity: 0.4;
+        }
+        body.style-4d::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(214,28,28,0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(26,25,25,0.2) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* SPINNING ANIMATION KEYFRAMES */
+        @keyframes spin-around {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* LOGIN INTERFACE PANEL */
+        .auth-box { max-width: 420px; margin: 90px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-top: 6px solid var(--dy-red); position: relative; z-index: 10; }
+        .brand-header { text-align: center; margin-bottom: 25px; }
+        .logo-wrapper { display: flex; justify-content: center; margin-bottom: 15px; }
+        
+        /* The Outside Login Logo is STATIC (Does not spin) */
+        .auth-logo { 
+            height: 120px; 
+            width: auto; 
+            max-width: 100%;
+            object-fit: contain; 
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); 
+        }
+        .brand-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--dark-neutral); }
+        .brand-header p { font-size: 13px; color: var(--text-muted); }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--dark-neutral); }
+        .input-group input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; background: #f9fafb; transition: all 0.2s; }
+        .input-group input:focus { border-color: var(--dy-red); background: #ffffff; outline: none; box-shadow: 0 0 0 3px rgba(214, 28, 28, 0.1); }
+
+        /* BUTTON MECHANICS */
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--dy-red), var(--dy-dark-crimson)); color: #fff; padding: 13px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(214, 28, 28, 0.2); }
+        .btn-primary:hover { opacity: 0.95; }
+        .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500; background-color: rgba(255,255,255,0.7); }
+        .btn-secondary:hover { background: #f3f4f6; }
+        .btn-success { background-color: #10ac84; color: white; padding: 11px 22px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(16,172,132,0.15); }
+        .btn-success:hover { background-color: #0ca37a; }
+        .btn-danger { background-color: #ee5253; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .btn-danger:hover { background-color: #ff6b6b; }
+
+        .error-msg { margin-top: 15px; color: var(--dy-red); font-size: 13px; font-weight: bold; text-align: center; }
+
+        /* APP HEADER & INTERNAL ECOSYSTEM */
+        .app-header { background: var(--dark-neutral); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dy-red); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        
+        /* The Inside Header Logo SPINS smoothly and infinitely */
+        .header-logo { 
+            height: 38px; 
+            width: auto; 
+            animation: spin-around 12s linear infinite; 
+        }
+        .app-logo { font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #ffffff; }
+        .platform-badge { background: var(--dy-red); color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; }
+        
+        .header-right { display: flex; align-items: center; gap: 15px; position: relative; }
+        #user-display { font-size: 14px; color: #ffffff; font-weight: 600; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* ACTIVE SESSION MONITOR */
+        .online-tracker { display: flex; align-items: center; gap: 6px; background: rgba(16, 172, 132, 0.15); border: 1px solid rgba(16, 172, 132, 0.3); padding: 6px 12px; border-radius: 6px; color: #10ac84; font-size: 13px; font-weight: bold; cursor: pointer; position: relative; transition: background 0.2s; user-select: none; }
+        .online-tracker:hover { background: rgba(16, 172, 132, 0.25); }
+        .online-dot { width: 8px; height: 8px; background-color: #10ac84; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+        
+        .online-dropdown { display: none; position: absolute; top: 110%; right: 180px; width: 220px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; padding: 10px 0; color: var(--text-primary); }
+        .online-dropdown h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 6px 15px; border-bottom: 1px solid #f3f4f6; margin-bottom: 5px; }
+        .online-user-item { display: flex; align-items: center; gap: 8px; padding: 8px 15px; font-size: 13px; font-weight: 500; }
+        .online-user-item::before { content: ""; width: 6px; height: 6px; background: #10ac84; border-radius: 50%; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 172, 132, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 172, 132, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 172, 132, 0); }
+        }
+
+        .content-grid { display: grid; grid-template-columns: 330px 1fr; gap: 25px; padding: 25px; max-width: 1750px; margin: 0 auto; position: relative; z-index: 10; }
+        .card { background: var(--surface-card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); margin-bottom: 20px; backdrop-filter: blur(8px); }
+        .card h3 { font-size: 16px; margin-bottom: 6px; color: var(--dark-neutral); font-weight: 700; }
+        .section-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4; }
+
+        .upload-dropzone { border: 2px dashed #d1d5db; padding: 25px 15px; text-align: center; border-radius: 8px; background: rgba(250,250,250,0.8); cursor: pointer; transition: border-color 0.2s; }
+        .upload-dropzone:hover { border-color: var(--dy-red); background: #fffbfb; }
+        .upload-dropzone p { font-size: 14px; font-weight: 600; color: var(--dark-neutral); }
+        #file-status { display: block; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+
+        textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 14px; resize: vertical; font-family: monospace; background: rgba(255,255,255,0.9); }
+        textarea:focus { border-color: var(--dy-red); outline: none; box-shadow: 0 0 0 3px rgba(214, 28, 28, 0.05); }
+
+        .user-mgmt-input, .wp-select-input { width: 100%; padding: 8px 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: white; }
+        .user-list-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .user-list-table th { text-align: left; padding: 6px; background: #f3f4f6; color: var(--text-primary); }
+        .user-list-table td { padding: 6px; border-bottom: 1px solid #e5e7eb; }
+
+        .wp-divider { border: 0; border-top: 1px dashed var(--border-color); margin: 15px 0; }
+
+        /* OUTPUT MATRIX GRID GRID */
+        .card-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; }
+        .info-placeholder { text-align: center; padding: 100px 20px; color: var(--text-muted); font-size: 14px; }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .styled-table th { background-color: #2b2a2a; color: white; padding: 12px; font-weight: 600; border: 1px solid #1a1919; text-align: center; line-height: 1.4; }
+        .sub-th { font-size: 11px; font-weight: normal; color: #9ca3af; }
+        .styled-table td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; font-weight: 500; color: #1f2937; background: rgba(255,255,255,0.85); }
+        .styled-table tbody tr:hover td { background-color: #f1f2f6; }
+        
+        .value-critical { color: var(--dy-red) !important; font-weight: 700 !important; }
+        .value-standard { color: var(--text-primary) !important; font-weight: 500 !important; }
+
+        @media(max-width: 1000px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SECURE TEAM SIGN IN GATEWAY -->
+    <div id="login-container" class="auth-box">
+        <div class="brand-header">
+            <div class="logo-wrapper">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY GRUPO" class="auth-logo" id="main-global-logo-1">
+            </div>
+            <h2>Advertising Departments</h2>
+        </div>
+        <form id="login-form">
+            <div class="input-group">
+                <label>账号 User Account</label>
+                <input type="text" id="username" required placeholder="Enter username...">
+            </div>
+            <div class="input-group">
+                <label>密码 Security Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary">登录 LogIn</button>
+            <div id="login-error" class="error-msg"></div>
+            <p>WWW.DYGRUPO.COM<p>
+        </form>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT (HIDDEN BY DEFAULT UNTIL AUTHENTICATED) -->
+    <div id="app-container" class="main-workspace" style="display: none;">
+        <header class="app-header">
+            <div class="header-left">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY" class="header-logo" id="main-global-logo-2">
+                <div class="app-logo">DYGRUPO</div>
+                <span class="platform-badge" id="platform-title">STANDBY MODE</span>
+            </div>
+            <div class="header-right">
+                <div class="online-tracker" onclick="toggleOnlineDropdown(event)">
+                    <span class="online-dot"></span>
+                    <span>🙎‍♂️Online Members: <span id="online-count">1</span></span>
+                </div>
+                <div class="online-dropdown" id="online-users-modal">
+                    <h4>在线者 Active Member</h4>
+                    <div id="online-users-list"></div>
+                </div>
+
+                <span id="user-display">Operator</span>
+                <button onclick="logout()" class="btn-secondary">➡️退出 LogOut</button>
+            </div>
+        </header>
+
+        <div class="content-grid">
+            <aside class="control-panel">
+                
+                <div class="card" id="admin-sync-card" style="display: none;">
+                    <h3>导入数据 Data Sync</h3>
+                    <p class="section-desc">Upload your updated copy of <b>DY- QuartoPG + ChamarPG data.xlsx</b> to map numbers into system memory.</p>
+                    <div class="upload-dropzone" onclick="document.getElementById('excel-file-picker').click()">
+                        <p>点击上传文件数据</p>
+                        <p>📥 Click to Upload File Data</p>
+                        <span id="file-status">Database unmounted</span>
+                    </div>
+                    <input type="file" id="excel-file-picker" accept=".xlsx, .xls" style="display: none;">
+                </div>
+
+                <div class="card" id="admin-control-card" style="display: none;">
+                    <h3>账号配置管理</h3>
+                    <h3>Account Configuration Management</h3>
+                    <p class="section-desc">Register authorized operator profiles for your desk personnel.</p>
+                    <input type="text" id="new-operator-username" class="user-mgmt-input" placeholder="创建用户 New Operator Username...">
+                    <input type="password" id="new-operator-password" class="user-mgmt-input" placeholder="创建密码 Assign Security Password...">
+                    <button onclick="createNewTeamAccount()" class="btn-primary" style="padding: 8px; font-size: 13px; margin-bottom: 12px;">+ 创建 Create User</button>
+                    
+                    <table class="user-list-table">
+                        <thead>
+                            <tr>
+                                <th>用户 Operator User</th>
+                                <th>密码 Password</th>
+                                <th>⚙️删除用户</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-management-tbody"></tbody>
+                    </table>
+
+                    <hr class="wp-divider">
+
+                    <h3>仪表盘样式和壁纸</h3>
+                    <h3>Dashboard Style & Wallpaper</h3>
+                    <p class="section-desc">Select layouts and upload your wallpaper folder for a synchronized team slideshow.</p>
+                    
+                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">布局引擎 LAYOUT ENGINE</label>
+                    <select id="wp-style-select" class="wp-select-input" onchange="saveWallpaperConfiguration()">
+                        <option value="standard">Standard Flat Minimalist</option>
+                        <option value="3d">Modern 3D Grid Overlay</option>
+                        <option value="4d">Deep 4D Holographic Blur</option>
+                    </select>
+
+                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">上传壁纸文件夹 UPLOAD WALLPAPER FOLDER</label>
+                    <input type="file" id="wp-folder-picker" webkitdirectory directory multiple class="wp-select-input" style="padding:4px;" onchange="handleWallpaperFolderUpload(this)">
+                    <span id="wp-folder-status" style="font-size:11px; color:var(--text-muted); display:block; margin-top:-6px; margin-bottom:10px;">No folder active</span>
+
+                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">WEB URL BACKUPS (OPTIONAL)</label>
+                    <textarea id="wp-urls-input" rows="2" class="user-mgmt-input" style="font-size:11px;" placeholder="Paste individual image links split by commas..." oninput="saveWallpaperConfiguration()"></textarea>
+                </div>
+
+                <div class="card search-box-card">
+                    <h3>ID 搜索 Search:Agent ID 🔍</h3>
+                    <p class="section-desc">Type or paste multiple Agent IDs below (one ID per line, or separated by commas/spaces).</p>
+                    <textarea id="search-input" rows="8" placeholder="Paste IDs here..."></textarea>
+                    <button onclick="triggerBatchSearch()" class="btn-primary" style="margin-top: 15px;">搜索 Search Data 🔍</button>
+                    <button onclick="clearSearch()" class="btn-secondary" style="margin-top: 5px; width: 100%;">清除 Clear</button>
+                </div>
+            </aside>
+
+            <main class="data-view-panel">
+                <div class="card data-card">
+                    <div class="card-action-header">
+                        <h3>代理数据 DATA RESULT 📈 </h3>
+                        <button onclick="copyTableToClipboard()" id="copy-btn" class="btn-success" style="display:
+复制数据
+ none;">📋 复制数据 Copy Data for WPS</button>
+                    </div>
+                    
+                    <div id="welcome-message" class="info-placeholder">
+                        <p>请在左侧面板输入代理 ID 以获取数据                        <p>Database operational. Enter Agent IDs on the left panel to fetch target metrics⚠️.</p>
+                    </div>
+
+                    <div class="table-responsive" id="table-wrapper" style="display: none;">
+                        <table class="styled-table" id="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>代理ID<br><span class="sub-th">Agent ID</span></th>
+                                    <th>代理账号<br><span class="sub-th">Agent account</span></th>
+                                    <th>个人修正补单<br><span class="sub-th">AVD Fee</span></th>
+                                    <th>储户<br><span class="sub-th">Depositor</span></th>
+                                    <th>直属充值金额<br><span class="sub-th">Recharge</span></th>
+                                    <th>直属提现金额<br><span class="sub-th">Withdraw</span></th>
+                                    <th>直属有效投注<br><span class="sub-th">Direct Betting</span></th>
+                                    <th>平均值<br><span class="sub-th">Average</span></th>
+                                    <th>盈利<br><span class="sub-th">Win/Lose</span></th>
+                                    <th>打码<br><span class="sub-th">Dama</span></th>
+                                    <th>平台<br><span class="sub-th">Platform</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- SECURE FILE DETECTOR AND BRIDGE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const targetLocalImage = "DY 2606 logo.png";
+            const testImg = new Image();
+            testImg.onload = function() {
+                document.getElementById('main-global-logo-1').src = targetLocalImage;
+                document.getElementById('main-global-logo-2').src = targetLocalImage;
+            };
+            testImg.src = targetLocalImage;
+        });
+
+        const MASTER_ADMIN = "AREX";
+        const MASTER_SECRET = "125800###"; 
+        const TIMEOUT_LIMIT = 30 * 60 * 1000; 
+
+        let indexedSpreadsheetData = {}; 
+        let currentActiveUser = "";
+        
+        let activeWallpaperArray = [];
+        let slideshowTimerIndex = 0;
+        let slideshowIntervalHandler = null;
+
+        if (!localStorage.getItem('dy_team_database')) {
+            localStorage.setItem('dy_team_database', JSON.stringify({}));
+        }
+        if (!localStorage.getItem('dy_online_sessions')) {
+            localStorage.setItem('dy_online_sessions', JSON.stringify({}));
+        }
+        if (!localStorage.getItem('dy_wallpaper_config')) {
+            localStorage.setItem('dy_wallpaper_config', JSON.stringify({ style: "standard", urls: "", isFolder: false, count: 0 }));
+        }
+        if (!localStorage.getItem('dy_spreadsheet_memory')) {
+            localStorage.setItem('dy_spreadsheet_memory', JSON.stringify({}));
+        }
+
+        const viewLogin     = document.getElementById('login-container');
+        const viewWorkspace = document.getElementById('app-container');
+        const inputExcel    = document.getElementById('excel-file-picker');
+        const labelStatus   = document.getElementById('file-status');
+        const labelPlatform = document.getElementById('platform-title');
+        const adminCard     = document.getElementById('admin-control-card');
+        const adminSyncCard = document.getElementById('admin-sync-card');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const persistedUser = localStorage.getItem('dy_active_session_user');
+            try {
+                indexedSpreadsheetData = JSON.parse(localStorage.getItem('dy_spreadsheet_memory')) || {};
+                const entryCount = Object.keys(indexedSpreadsheetData).length;
+                if (entryCount > 0) {
+                    labelStatus.innerText = `Data Count: ${entryCount} 条 Data.`;
+                    labelPlatform.innerText = "WWW.DYGRUPO.COM";
+                }
+            } catch(e) { indexedSpreadsheetData = {}; }
+
+            if (persistedUser) {
+                const teamDb = JSON.parse(localStorage.getItem('dy_team_database'));
+                if (persistedUser === MASTER_ADMIN || teamDb[persistedUser]) {
+                    bootAuthenticatedWorkspace(persistedUser);
+                } else {
+                    logout();
+                }
+            }
+            resetActivityTimer();
+        });
+
+        function resetActivityTimer() {
+            if (localStorage.getItem('dy_active_session_user')) {
+                localStorage.setItem('dy_last_activity_stamp', Date.now().toString());
+            }
+        }
+
+        window.addEventListener('mousemove', resetActivityTimer);
+        window.addEventListener('mousedown', resetActivityTimer);
+        window.addEventListener('keydown', resetActivityTimer);
+        window.addEventListener('scroll', resetActivityTimer);
+
+        setInterval(() => {
+            const user = localStorage.getItem('dy_active_session_user');
+            if (user) {
+                const lastActivity = parseInt(localStorage.getItem('dy_last_activity_stamp') || "0");
+                if (Date.now() - lastActivity > TIMEOUT_LIMIT) {
+                    logout();
+                    alert("Session Blocked: Terminated due to 30 minutes of inactivity.");
+                } else {
+                    registerSession(user);
+                }
+            }
+        }, 5000);
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const accountInput = document.getElementById('username').value.trim();
+            const secretInput  = document.getElementById('password').value;
+            const alertBox     = document.getElementById('login-error');
+            const teamDb = JSON.parse(localStorage.getItem('dy_team_database'));
+
+            if (accountInput === MASTER_ADMIN && secretInput === MASTER_SECRET) {
+                localStorage.setItem('dy_active_session_user', accountInput);
+                bootAuthenticatedWorkspace(accountInput);
+            } else if (teamDb[accountInput] && teamDb[accountInput] === secretInput) {
+                localStorage.setItem('dy_active_session_user', accountInput);
+                bootAuthenticatedWorkspace(accountInput);
+            } else {
+                alertBox.innerText = "❌ Security Alert: Verification parameters rejected.";
+            }
+        });
+
+        function bootAuthenticatedWorkspace(user) {
+            currentActiveUser = user;
+            document.getElementById('login-error').innerText = "";
+            
+            if (user === MASTER_ADMIN) {
+                document.getElementById('user-display').innerText = `管理员 Admin User: ${user}`;
+                adminCard.style.display = 'block'; 
+                adminSyncCard.style.display = 'block'; 
+                renderUserListTable();
+                loadWallpaperInterfaceValues();
+            } else {
+                document.getElementById('user-display').innerText = `账号 User: ${user}`;
+                adminCard.style.display = 'none'; 
+                adminSyncCard.style.display = 'none'; 
+            }
+
+            viewLogin.style.display = 'none';
+            viewWorkspace.style.display = 'block';
+            resetActivityTimer();
+            registerSession(user);
+            applyLiveWallpaperEngine();
+        }
+
+        function logout() {
+            const priorUser = localStorage.getItem('dy_active_session_user') || currentActiveUser;
+            if (priorUser) {
+                removeSession(priorUser);
+            }
+            localStorage.removeItem('dy_active_session_user');
+            localStorage.removeItem('dy_last_activity_stamp');
+            
+            viewWorkspace.style.display = 'none';
+            viewLogin.style.display = 'block';
+            document.getElementById('username').value = "";
+            document.getElementById('password').value = "";
+            currentActiveUser = "";
+            
+            document.body.className = "";
+            document.body.style.backgroundImage = "none";
+            clearInterval(slideshowIntervalHandler);
+        }
+
+        // --- BACKGROUND WALLPAPER HANDLING SLIDESHOW ENGINE ---
+        function loadWallpaperInterfaceValues() {
+            const config = JSON.parse(localStorage.getItem('dy_wallpaper_config'));
+            document.getElementById('wp-style-select').value = config.style || "standard";
+            document.getElementById('wp-urls-input').value = config.isFolder ? "" : (config.urls || "");
+            if(config.isFolder) {
+                document.getElementById('wp-folder-status').innerHTML = `✅ Running slideshow: <b>${config.count}</b> images loaded.`;
+            }
+        }
+
+        function saveWallpaperConfiguration() {
+            const layoutStyle = document.getElementById('wp-style-select').value;
+            const textUrls = document.getElementById('wp-urls-input').value;
+            
+            const currentConfig = JSON.parse(localStorage.getItem('dy_wallpaper_config')) || {};
+            currentConfig.style = layoutStyle;
+            
+            if (textUrls.trim() !== "") {
+                currentConfig.urls = textUrls;
+                currentConfig.isFolder = false;
+                currentConfig.count = 0;
+                document.getElementById('wp-folder-status').innerText = "No folder active";
+            }
+            
+            localStorage.setItem('dy_wallpaper_config', JSON.stringify(currentConfig));
+            applyLiveWallpaperEngine();
+        }
+
+        function handleWallpaperFolderUpload(inputField) {
+            const uploadedFiles = Array.from(inputField.files);
+            const verifiedImages = uploadedFiles.filter(file => file.type.startsWith('image/'));
+            
+            if (verifiedImages.length === 0) {
+                alert("No valid images found in the uploaded folder.");
+                return;
+            }
+
+            document.getElementById('wp-folder-status').innerText = "Compressing directory matrix...";
+            
+            let processedBase64Array = [];
+            let loadedCount = 0;
+
+            verifiedImages.forEach(file => {
+                const imgReader = new FileReader();
+                imgReader.onload = function(e) {
+                    processedBase64Array.push(e.target.result);
+                    loadedCount++;
+
+                    if (loadedCount === verifiedImages.length) {
+                        const currentConfig = JSON.parse(localStorage.getItem('dy_wallpaper_config')) || {};
+                        currentConfig.urls = processedBase64Array.join("|||"); 
+                        currentConfig.isFolder = true;
+                        currentConfig.count = 0;
+
+                        try {
+                            localStorage.setItem('dy_wallpaper_config', JSON.stringify(currentConfig));
+                        } catch(domExc) {
+                            alert("Local Storage quota reached. Loading local active workspace context instead.");
+                        }
+                        
+                        activeWallpaperArray = processedBase64Array;
+                        document.getElementById('wp-folder-status').innerHTML = `✅ Running slideshow: <b>${loadedCount}</b> assets active.`;
+                        document.getElementById('wp-urls-input').value = ""; 
+                        applyLiveWallpaperEngine(true);
+                    }
+                };
+                imgReader.readAsDataURL(file);
+            });
+        }
+
+        function applyLiveWallpaperEngine(bypassStorageRead = false) {
+            clearInterval(slideshowIntervalHandler);
+            const config = JSON.parse(localStorage.getItem('dy_wallpaper_config'));
+            if (!config) return;
+
+            document.body.className = "";
+            if (config.style === "3d") document.body.classList.add("style-3d");
+            if (config.style === "4d") document.body.classList.add("style-4d");
+
+            if (!bypassStorageRead) {
+                if (config.urls && config.urls.trim() !== "") {
+                    if (config.isFolder) {
+                        activeWallpaperArray = config.urls.split("|||");
+                    } else {
+                        activeWallpaperArray = config.urls.split(",").map(url => url.trim()).filter(url => url.length > 5);
+                    }
+                } else {
+                    activeWallpaperArray = [];
+                }
+            }
+            
+            if (activeWallpaperArray.length === 0) {
+                document.body.style.backgroundImage = "none";
+                return;
+            }
+
+            slideshowTimerIndex = 0;
+            executeWallpaperCycle();
+
+            if (activeWallpaperArray.length > 1) {
+                slideshowIntervalHandler = setInterval(() => {
+                    slideshowTimerIndex = (slideshowTimerIndex + 1) % activeWallpaperArray.length;
+                    executeWallpaperCycle();
+                }, 6000); 
+            }
+        }
+
+        function executeWallpaperCycle() {
+            if (activeWallpaperArray[slideshowTimerIndex]) {
+                document.body.style.backgroundImage = `url('${activeWallpaperArray[slideshowTimerIndex]}')`;
+            }
+        }
+
+        // --- SESSION HEARTBEAT TRACKING ---
+        function registerSession(username) {
+            const sessions = JSON.parse(localStorage.getItem('dy_online_sessions')) || {};
+            sessions[username] = Date.now();
+            localStorage.setItem('dy_online_sessions', JSON.stringify(sessions));
+            updateOnlineDisplay();
+        }
+
+        function removeSession(username) {
+            const sessions = JSON.parse(localStorage.getItem('dy_online_sessions')) || {};
+            delete sessions[username];
+            localStorage.setItem('dy_online_sessions', JSON.stringify(sessions));
+            updateOnlineDisplay();
+        }
+
+        function updateOnlineDisplay() {
+            const sessions = JSON.parse(localStorage.getItem('dy_online_sessions')) || {};
+            const cleanListElement = document.getElementById('online-users-list');
+            const counterElement   = document.getElementById('online-count');
+            
+            const now = Date.now();
+            let activeCount = 0;
+            cleanListElement.innerHTML = "";
+
+            if (Object.keys(sessions).length === 0 && currentActiveUser) {
+                sessions[currentActiveUser] = now;
+            }
+
+            for (const user in sessions) {
+                if (now - sessions[user] < 20000) { 
+                    activeCount++;
+                    const item = document.createElement('div');
+                    item.className = 'online-user-item';
+                    item.innerText = user;
+                    cleanListElement.appendChild(item);
+                } else {
+                    delete sessions[user];
+                }
+            }
+            counterElement.innerText = activeCount;
+        }
+
+        function toggleOnlineDropdown(e) {
+            e.stopPropagation();
+            const modal = document.getElementById('online-users-modal');
+            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
+        }
+
+        window.addEventListener('click', () => {
+            document.getElementById('online-users-modal').style.display = 'none';
+        });
+
+        // --- TEAM ACCOUNT MANAGING SYSTEM ---
+        function createNewTeamAccount() {
+            const uInput = document.getElementById('new-operator-username');
+            const pInput = document.getElementById('new-operator-password');
+            const username = uInput.value.trim();
+            const password = pInput.value;
+
+            if(!username || !password) {
+                alert("Complete provisioning fields.");
+                return;
+            }
+
+            const database = JSON.parse(localStorage.getItem('dy_team_database')) || {};
+            database[username] = password;
+            localStorage.setItem('dy_team_database', JSON.stringify(database));
+            
+            uInput.value = "";
+            pInput.value = "";
+            renderUserListTable();
+        }
+
+        function deleteTeamAccount(username) {
+            const database = JSON.parse(localStorage.getItem('dy_team_database')) || {};
+            delete database[username];
+            localStorage.setItem('dy_team_database', JSON.stringify(database));
+            renderUserListTable();
+        }
+
+        function renderUserListTable() {
+            const tableBody = document.getElementById('user-management-tbody');
+            const database = JSON.parse(localStorage.getItem('dy_team_database')) || {};
+            tableBody.innerHTML = "";
+
+            for (const operator in database) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${operator}</td>
+                    <td>••••••••</td>
+                    <td><button class="btn-danger" onclick="deleteTeamAccount('${operator}')">Delete User</button></td>
+                `;
+                tableBody.appendChild(tr);
+            }
+        }
+
+        // --- IMPROVED EXCEL DATA STORAGE INGESTION ENGINE ---
+        inputExcel.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            labelStatus.innerText = "Indexing workbook calculations...";
+            const reader = new FileReader();
+            
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const sheetName = workbook.SheetNames.includes("数据") ? "数据" : workbook.SheetNames[0];
+                    const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                    
+                    indexedSpreadsheetData = {};
+                    
+                    rawRows.forEach(row => {
+                        let cleanRow = {};
+                        for (let key in row) {
+                            // Aggressive clean: remove all spacing, newlines, and tabs completely
+                            let normalizedKey = key.replace(/\s+/g, '').replace(/\n/g, '').replace(/\r/g, '').trim();
+                            cleanRow[normalizedKey] = row[key];
+                        }
+
+                        // Target exact text sub-matches flexibly
+                        let idKey = Object.keys(cleanRow).find(k => k.includes('代理ID') || k.toLowerCase().includes('agentid'));
+                        let id = idKey ? cleanRow[idKey] : '';
+                        
+                        if (id) {
+                            let accountKey = Object.keys(cleanRow).find(k => k.includes('代理账号') || k.toLowerCase().includes('agentaccount')) || '';
+                            let avdKey = Object.keys(cleanRow).find(k => k.includes('个人修正') || k.toLowerCase().includes('avd')) || '';
+                            let depKey = Object.keys(cleanRow).find(k => k.includes('首充') || k.includes('储户') || k.toLowerCase().includes('depositor')) || '';
+                            let rechKey = Object.keys(cleanRow).find(k => k.includes('充值') || k.toLowerCase().includes('recharge')) || '';
+                            let withKey = Object.keys(cleanRow).find(k => k.includes('提现') || k.toLowerCase().includes('withdraw')) || '';
+                            let betKey = Object.keys(cleanRow).find(k => k.includes('投注') || k.toLowerCase().includes('betting')) || '';
+                            let avgKey = Object.keys(cleanRow).find(k => k.includes('平均') || k.toLowerCase().includes('average')) || '';
+                            let wlKey = Object.keys(cleanRow).find(k => k.includes('盈利') || k.toLowerCase().includes('win')) || '';
+                            let damaKey = Object.keys(cleanRow).find(k => k.includes('打码') || k.toLowerCase().includes('dama')) || '';
+                            let platKey = Object.keys(cleanRow).find(k => k.includes('平台') || k.toLowerCase().includes('platform')) || '';
+
+                            indexedSpreadsheetData[String(id).trim()] = {
+                                account: cleanRow[accountKey] || '-',
+                                avdFee: cleanRow[avdKey] || 0,
+                                depositor: cleanRow[depKey] || 0,
+                                recharge: cleanRow[rechKey] || 0,
+                                withdraw: cleanRow[withKey] || 0,
+                                betting: cleanRow[betKey] || 0,
+                                average: cleanRow[avgKey] || 0,
+                                winLose: cleanRow[wlKey] || 0,
+                                dama: cleanRow[damaKey] || 0,
+                                platform: cleanRow[platKey] || '-'
+                            };
+                        }
+                    });
+
+                    localStorage.setItem('dy_spreadsheet_memory', JSON.stringify(indexedSpreadsheetData));
+                    labelStatus.innerText = `Database online: ${Object.keys(indexedSpreadsheetData).length} maps loaded.`;
+                    labelPlatform.innerText = "WWW.DYGRUPO.COM";
+                } catch(err) {
+                    labelStatus.innerText = "Error parsing document runtime matrix structure.";
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // --- METRICS BATCH PARSER & EXECUTOR ---
+        function triggerBatchSearch() {
+            const inputField = document.getElementById('search-input');
+            const targetRawText = inputField.value;
+            
+            const queryIds = targetRawText.split(/[\n, ]+/).map(id => id.trim()).filter(id => id.length > 0);
+            
+            const tableBody = document.getElementById('metrics-tbody');
+            const welcomeMsg = document.getElementById('welcome-message');
+            const tableWrap = document.getElementById('table-wrapper');
+            const copyBtn = document.getElementById('copy-btn');
+
+            tableBody.innerHTML = "";
+
+            if (queryIds.length === 0) {
+                welcomeMsg.style.display = "block";
+                tableWrap.style.display = "none";
+                copyBtn.style.display = "none";
+                return;
+            }
+
+            welcomeMsg.style.display = "none";
+            tableWrap.style.display = "block";
+            copyBtn.style.display = "inline-block";
+
+            queryIds.forEach(id => {
+                const tr = document.createElement('tr');
+                const dataset = indexedSpreadsheetData[id];
+
+                if (dataset) {
+                    const winLoseClass = parseFloat(dataset.winLose) < 0 ? "value-critical" : "value-standard";
+                    tr.innerHTML = `
+                        <td><b>${id}</b></td>
+                        <td>${dataset.account}</td>
+                        <td>${dataset.avdFee}</td>
+                        <td>${dataset.depositor}</td>
+                        <td>${dataset.recharge}</td>
+                        <td>${dataset.withdraw}</td>
+                        <td>${dataset.betting}</td>
+                        <td>${dataset.average}</td>
+                        <td class="${winLoseClass}">${dataset.winLose}</td>
+                        <td>${dataset.dama}</td>
+                        <td>${dataset.platform}</td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td><b>${id}</b></td>
+                        <td colspan="10" style="color:var(--text-muted); font-style:italic;">No records identified matching Operator query bounds.</td>
+                    `;
+                }
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = "";
+            document.getElementById('metrics-tbody').innerHTML = "";
+            document.getElementById('welcome-message').style.display = "block";
+            document.getElementById('table-wrapper').style.display = "none";
+            document.getElementById('copy-btn').style.display = "none";
+        }
+
+        // --- CLIPBOARD ACTION ARCHITECTURE ---
+        function copyTableToClipboard() {
+            const targetTable = document.getElementById('metrics-table');
+            let textOutputBuffer = "";
+
+            for (let rowIndex = 0; rowIndex < targetTable.rows.length; rowIndex++) {
+                let activeRowData = [];
+                const parsedCells = targetTable.rows[rowIndex].cells;
+                
+                for (let cellIndex = 0; cellIndex < parsedCells.length; cellIndex++) {
+                    let cleaningValue = parsedCells[cellIndex].innerText.replace(/\n/g, " ");
+                    activeRowData.push(cleaningValue);
+                }
+                textOutputBuffer += activeRowData.join("\t") + "\n";
+            }
+
+            navigator.clipboard.writeText(textOutputBuffer).then(() => {
+                const origBtn = document.getElementById('copy-btn');
+                const cacheText = origBtn.innerText;
+                origBtn.innerText = "✅ Matrix copied to clipboard!";
+                origBtn.style.backgroundColor = "#0ca37a";
+                setTimeout(() => {
+                    origBtn.innerText = cacheText;
+                    origBtn.style.backgroundColor = "";
+                }, 2000);
+            }).catch(err => {
+                alert("Security block layout restriction prevented automatic replication matrix.");
+            });
+        }
+    </script>
+</body>
+</html>
