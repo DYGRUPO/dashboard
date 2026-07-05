@@ -158,39 +158,28 @@
 </head>
 <body>
 
-<!-- SECURE TEAM SIGN IN GATEWAY -->
-<div id="login-container" class="auth-box">
-    <div class="brand-header">
-        <div class="logo-wrapper">
-            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY GRUPO" class="auth-logo" id="main-global-logo-1">
+    <!-- SECURE TEAM SIGN IN GATEWAY -->
+    <div id="login-container" class="auth-box">
+        <div class="brand-header">
+            <div class="logo-wrapper">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23d61c1c'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'>DY</text></svg>" alt="DY GRUPO" class="auth-logo" id="main-global-logo-1">
+            </div>
+            <h2>Advertising Departments</h2>
         </div>
-
-        <h2>Advertising Departments</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <label>账号 User Account</label>
+                <input type="text" id="username" required placeholder="Enter username...">
+            </div>
+            <div class="input-group">
+                <label>密码 Security Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary">登录 LogIn</button>
+            <div id="login-error" class="error-msg"></div>
+            <p>WWW.DYGRUPO.COM<p>
+        </form>
     </div>
-
-    <form id="login-form">
-
-        <div class="input-group">
-            <label>账号 User Account</label>
-            <input type="text" id="username" required placeholder="Enter username...">
-        </div>
-
-        <div class="input-group">
-            <label>密码 Security Password</label>
-            <input type="password" id="password" required placeholder="••••••••">
-        </div>
-
-        <button type="submit" class="btn-primary">
-            登录 LogIn
-        </button>
-
-        <div id="login-error" class="error-msg"></div>
-
-                                                    <a href="#">WWW.DYGRUPO.COM</a>
-        </div>
-
-    </form>
-</div>
 
     <!-- MAIN DASHBOARD CONTENT (HIDDEN BY DEFAULT UNTIL AUTHENTICATED) -->
     <div id="app-container" class="main-workspace" style="display: none;">
@@ -706,74 +695,29 @@
                         let id = idKey ? cleanRow[idKey] : '';
                         
                         if (id) {
-let accountKey = Object.keys(cleanRow).find(k =>
-    k.includes('代理账号') ||
-    k.toLowerCase().includes('agent account')
-) || '';
+                            let accountKey = Object.keys(cleanRow).find(k => k.includes('代理账号') || k.toLowerCase().includes('agentaccount')) || '';
+                            let avdKey = Object.keys(cleanRow).find(k => k.includes('个人修正') || k.toLowerCase().includes('avd')) || '';
+                            let depKey = Object.keys(cleanRow).find(k => k.includes('首充') || k.includes('储户') || k.toLowerCase().includes('depositor')) || '';
+                            let rechKey = Object.keys(cleanRow).find(k => k.includes('充值') || k.toLowerCase().includes('recharge')) || '';
+                            let withKey = Object.keys(cleanRow).find(k => k.includes('提现') || k.toLowerCase().includes('withdraw')) || '';
+                            let betKey = Object.keys(cleanRow).find(k => k.includes('投注') || k.toLowerCase().includes('betting')) || '';
+                            let avgKey = Object.keys(cleanRow).find(k => k.includes('平均') || k.toLowerCase().includes('average')) || '';
+                            let wlKey = Object.keys(cleanRow).find(k => k.includes('盈利') || k.toLowerCase().includes('win')) || '';
+                            let damaKey = Object.keys(cleanRow).find(k => k.includes('打码') || k.toLowerCase().includes('dama')) || '';
+                            let platKey = Object.keys(cleanRow).find(k => k.includes('平台') || k.toLowerCase().includes('platform')) || '';
 
-let avdKey = Object.keys(cleanRow).find(k =>
-    k.includes('个人修正补单') ||
-    k.includes('个人修正') ||
-    k.toLowerCase().includes('avd fee')
-) || '';
-
-let depKey = Object.keys(cleanRow).find(k =>
-    k.includes('储户') ||
-    k.includes('depositor')
-) || '';
-
-let rechKey = Object.keys(cleanRow).find(k =>
-    k.includes('直属充值金额') ||
-    k.includes('充值') ||
-    k.toLowerCase().includes('recharge')
-) || '';
-
-let withKey = Object.keys(cleanRow).find(k =>
-    k.includes('直属提现金额') ||
-    k.includes('提现') ||
-    k.toLowerCase().includes('withdraw')
-) || '';
-
-let betKey = Object.keys(cleanRow).find(k =>
-    k.includes('直属有效投注') ||
-    k.toLowerCase().includes('direct betting')
-) || '';
-
-let avgKey = Object.keys(cleanRow).find(k =>
-    k.includes('平均值') ||
-    k.toLowerCase().includes('average')
-) || '';
-
-let winKey = Object.keys(cleanRow).find(k =>
-    k.includes('盈利') ||
-    k.toLowerCase().includes('win/lose')
-) || '';
-
-let damaKey = Object.keys(cleanRow).find(k =>
-    k.includes('打码') ||
-    k.toLowerCase().includes('dama')
-) || '';
-
-let platformKey = Object.keys(cleanRow).find(k =>
-    k.includes('平台') ||
-    k.toLowerCase().includes('platform')
-) || '';
-
-indexedSpreadsheetData[id] = {
-    id:id,
-    account: cleanRow[accountKey] || '',
-    avd: Number(cleanRow[avdKey]) || 0,
-    depositor: Number(cleanRow[depKey]) || 0,
-    recharge: Number(cleanRow[rechKey]) || 0,
-    withdraw: Number(cleanRow[withKey]) || 0,
-    betting: Number(cleanRow[betKey]) || 0,
-
-    average: Number(cleanRow[avgKey]) || 0,
-    winlose: Number(cleanRow[winKey]) || 0,
-    dama: Number(cleanRow[damaKey]) || 0,
-
-    platform: cleanRow[platformKey] || ''
-};
+                            indexedSpreadsheetData[String(id).trim()] = {
+                                account: cleanRow[accountKey] || '-',
+                                avdFee: cleanRow[avdKey] || 0,
+                                depositor: cleanRow[depKey] || 0,
+                                recharge: cleanRow[rechKey] || 0,
+                                withdraw: cleanRow[withKey] || 0,
+                                betting: cleanRow[betKey] || 0,
+                                average: cleanRow[avgKey] || 0,
+                                winLose: cleanRow[wlKey] || 0,
+                                dama: cleanRow[damaKey] || 0,
+                                platform: cleanRow[platKey] || '-'
+                            };
                         }
                     });
 
