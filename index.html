@@ -552,21 +552,6 @@
     return;
 }
 
-            slideshowTimerIndex = 0;
-            executeWallpaperCycle();
-
-            if (activeWallpaperArray.length > 1) {
-                slideshowIntervalHandler = setInterval(() => {
-                    slideshowTimerIndex = (slideshowTimerIndex + 1) % activeWallpaperArray.length;
-                    executeWallpaperCycle();
-                }, 6000); 
-            }
-        }
-
-        function executeWallpaperCycle() {
-            if (activeWallpaperArray[slideshowTimerIndex]) {
-                document.body.style.backgroundImage = `url('${activeWallpaperArray[slideshowTimerIndex]}')`;
-            }
         }
 
         // --- SESSION HEARTBEAT TRACKING ---
