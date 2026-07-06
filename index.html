@@ -22,20 +22,16 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
         
-        body{
-    margin:0;
-    min-height:50vh;
-
-    background-image:url("DYGRUPO-Backend01-MainLogin.png");
-    background-size:cover;
-    background-position:center center;
-    background-repeat:no-repeat;
-    background-attachment:fixed;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-primary); 
+            min-height: 100vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background 0.8s ease-in-out, filter 0.3s;
+        }
 
         /* Dimensional Grid Overlays */
         body.style-3d::before {
@@ -551,16 +547,9 @@
             }
             
             if (activeWallpaperArray.length === 0) {
-    document.body.style.backgroundImage =
-    "linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('./DYGRUPO-Backend01-MainLogin.png')";
-
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundAttachment = "fixed";
-
-    return;
-}
+                document.body.style.backgroundImage = "none";
+                return;
+            }
 
             slideshowTimerIndex = 0;
             executeWallpaperCycle();
