@@ -669,43 +669,41 @@
                     indexedSpreadsheetData = {};
                     
                     rawRows.forEach(row => {
-                        let cleanRow = {};
-                        for (let key in row) {
-                            // Aggressive clean: remove all spacing, newlines, and tabs completely
-                            let normalizedKey = key.replace(/\s+/g, '').replace(/\n/g, '').replace(/\r/g, '').trim();
-                            cleanRow[normalizedKey] = row[key];
-                        }
+    let cleanRow = {};
+    // Aggressive cleaning: remove all whitespace, newlines, and tabs
+    for (let key in row) {
+        let normalizedKey = String(key).replace(/[\s\n\r\t]/g, '').toLowerCase();
+        cleanRow[normalizedKey] = row[key];
+    }
 
-                        // Target exact text sub-matches flexibly
-                        let idKey = Object.keys(cleanRow).find(k => k.includes('代理ID') || k.toLowerCase().includes('agentid'));
-                        let id = idKey ? cleanRow[idKey] : '';
-                        
-                        if (id) {
-                            let accountKey = Object.keys(cleanRow).find(k => k.includes('代理账号') || k.toLowerCase().includes('agentaccount')) || '';
-                            let avdKey = Object.keys(cleanRow).find(k => k.includes('个人修正') || k.toLowerCase().includes('avd')) || '';
-                            let depKey = Object.keys(cleanRow).find(k => k.includes('首充') || k.includes('储户') || k.toLowerCase().includes('depositor')) || '';
-                            let rechKey = Object.keys(cleanRow).find(k => k.includes('充值') || k.toLowerCase().includes('recharge')) || '';
-                            let withKey = Object.keys(cleanRow).find(k => k.includes('提现') || k.toLowerCase().includes('withdraw')) || '';
-                            let betKey = Object.keys(cleanRow).find(k => k.includes('投注') || k.toLowerCase().includes('betting')) || '';
-                            let avgKey = Object.keys(cleanRow).find(k => k.includes('平均') || k.toLowerCase().includes('average')) || '';
-                            let wlKey = Object.keys(cleanRow).find(k => k.includes('盈利') || k.toLowerCase().includes('win')) || '';
-                            let damaKey = Object.keys(cleanRow).find(k => k.includes('打码') || k.toLowerCase().includes('dama')) || '';
-                            let platKey = Object.keys(cleanRow).find(k => k.includes('平台') || k.toLowerCase().includes('platform')) || '';
+    // Flexible matching helper
+    const getVal = (possibleKeys) => {
+        for (let pattern of possibleKeys) {
+            let match = Object.keys(cleanRow).find(k => k.includes(pattern.toLowerCase()));
+            if (match) return cleanRow[match];
+        }
+        return 0; // Default if not found
+    };
 
-                            indexedSpreadsheetData[String(id).trim()] = {
-                                account: cleanRow[accountKey] || '-',
-                                avdFee: cleanRow[avdKey] || 0,
-                                depositor: cleanRow[depKey] || 0,
-                                recharge: cleanRow[rechKey] || 0,
-                                withdraw: cleanRow[withKey] || 0,
-                                betting: cleanRow[betKey] || 0,
-                                average: cleanRow[avgKey] || 0,
-                                winLose: cleanRow[wlKey] || 0,
-                                dama: cleanRow[damaKey] || 0,
-                                platform: cleanRow[platKey] || '-'
-                            };
-                        }
-                    });
+    // Locate the ID key first
+    let idKey = Object.keys(cleanRow).find(k => k.includes('agentid') || k.includes('代理id'));
+    let id = idKey ? cleanRow[idKey] : '';
+
+    if (id) {
+        indexedSpreadsheetData[String(id).trim()] = {
+            account:   getVal(['agentaccount', '代理账号']),
+            avdFee:    getVal(['avd', '个人修正']),
+            depositor: getVal(['depositor', '储户', '首充']),
+            recharge:  getVal(['recharge', '充值']),
+            withdraw:  getVal(['withdraw', '提现']),
+            betting:   getVal(['betting', '投注']),
+            average:   getVal(['average', 'avg', '平均值', '平均']),
+            winLose:   getVal(['win', 'lose', '盈利', '盈亏', 'win/lose']),
+            dama:      getVal(['dama', 'bet', '流水', '打码']),
+            platform:  getVal(['platform', '平台'])
+        };
+    }
+});
 
                     localStorage.setItem('dy_spreadsheet_memory', JSON.stringify(indexedSpreadsheetData));
                     labelStatus.innerText = `Database online: ${Object.keys(indexedSpreadsheetData).length} maps loaded.`;
