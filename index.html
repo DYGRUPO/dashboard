@@ -670,37 +670,49 @@
                     
                     rawRows.forEach(row => {
     let cleanRow = {};
-    // Aggressive cleaning: remove all whitespace, newlines, and tabs
     for (let key in row) {
         let normalizedKey = String(key).replace(/[\s\n\r\t]/g, '').toLowerCase();
         cleanRow[normalizedKey] = row[key];
     }
 
-    // Flexible matching helper
-    const getVal = (possibleKeys) => {
+    // Helper to extract numbers safely
+    const getNum = (possibleKeys) => {
         for (let pattern of possibleKeys) {
             let match = Object.keys(cleanRow).find(k => k.includes(pattern.toLowerCase()));
-            if (match) return cleanRow[match];
+            if (match) return parseFloat(cleanRow[match]) || 0;
         }
-        return 0; // Default if not found
+        return 0;
     };
 
-    // Locate the ID key first
-    let idKey = Object.keys(cleanRow).find(k => k.includes('agentid') || k.includes('代理id'));
-    let id = idKey ? cleanRow[idKey] : '';
+    let id = cleanRow[Object.keys(cleanRow).find(k => k.includes('agentid') || k.includes('代理id'))];
 
     if (id) {
+        const recharge = getNum(['recharge', '充值']);
+        const withdraw = getNum(['withdraw', '提现']);
+        const betting  = getNum(['betting', '投注', 'directbetting']);
+        const avd      = getNum(['avd', '个人修正']);
+
+        // --- CALCULATED FIELDS ---
+        // 1. Win/Lose: Recharge - Withdraw - AVD Fee
+        const winLose = recharge - withdraw - avd;
+        
+        // 2. Average: (recharge + withdraw) / 2 (or your specific formula)
+        const average = (recharge + withdraw) / 2;
+
+        // 3. Dama: Usually equals the valid betting amount
+        const dama = betting;
+
         indexedSpreadsheetData[String(id).trim()] = {
-            account:   getVal(['agentaccount', '代理账号']),
-            avdFee:    getVal(['avd', '个人修正']),
-            depositor: getVal(['depositor', '储户', '首充']),
-            recharge:  getVal(['recharge', '充值']),
-            withdraw:  getVal(['withdraw', '提现']),
-            betting:   getVal(['betting', '投注']),
-            average:   getVal(['average', 'avg', '平均值', '平均']),
-            winLose:   getVal(['win', 'lose', '盈利', '盈亏', 'win/lose']),
-            dama:      getVal(['dama', 'bet', '流水', '打码']),
-            platform:  getVal(['platform', '平台'])
+            account:   cleanRow[Object.keys(cleanRow).find(k => k.includes('agentaccount'))] || '-',
+            avdFee:    avd,
+            depositor: getNum(['depositor', '储户']),
+            recharge:  recharge,
+            withdraw:  withdraw,
+            betting:   betting,
+            average:   average.toFixed(2),
+            winLose:   winLose.toFixed(2),
+            dama:      dama,
+            platform:  cleanRow[Object.keys(cleanRow).find(k => k.includes('platform'))] || '-'
         };
     }
 });
